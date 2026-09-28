@@ -1,0 +1,428 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Oriel design tokens ───────────────────────── */
+@theme {
+  --color-porcelain: #f7f4ee;
+  --color-linen: #ede6da;
+  --color-shell: #fbf9f5;
+  --color-ink: #1e2926;
+  --color-ink-soft: #55615c;
+  --color-sage: #4e6b5c;
+  --color-sage-deep: #3b5447;
+  --color-mist: #b9cbbe;
+  --color-mist-soft: #dfe8e1;
+  --color-sand: #d8c2a3;
+  --color-sand-soft: #eee2d0;
+  --color-glow: #f2d9a6;
+  --color-night: #18221f;
+  --color-line: rgb(30 41 38 / 0.12);
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-breath: cubic-bezier(0.45, 0, 0.2, 1);
+
+  --breakpoint-xs: 26rem;
+
+  --animate-float: float 7s var(--ease-breath) infinite;
+  --animate-marquee: marquee 60s linear infinite;
+}
+
+:root {
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+  --header-h: 76px;
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--color-porcelain);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* A whisper of paper grain over everything, for warmth. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("/grain.png");
+}
+
+::selection {
+  background: var(--color-mist);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@layer components {
+/* ───────────────────────── Type ───────────────────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  letter-spacing: -0.028em;
+  line-height: 0.98;
+}
+.display em,
+.serif-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.h-xl {
+  font-size: clamp(3rem, 9.2vw, 9.25rem);
+}
+.h-lg {
+  font-size: clamp(2.5rem, 6.4vw, 6rem);
+}
+.h-md {
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
+}
+.h-sm {
+  font-size: clamp(1.6rem, 2.6vw, 2.35rem);
+}
+.lede {
+  font-size: clamp(1.125rem, 1.5vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--color-ink-soft);
+}
+
+.container-x {
+  width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Arch-topped frames: the Oriel window motif. */
+.arch {
+  border-radius: 999px 999px 1.25rem 1.25rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+.arch-full {
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.6s var(--ease-soft);
+}
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ───────────────────────── First-paint (CSS-only) intros ───────────────────────── */
+@keyframes heading-in {
+  from {
+    clip-path: inset(0 0 55% 0);
+    transform: translateY(0.35em);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(-12% -2% -24% -2%);
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0.15;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes arch-open {
+  from {
+    clip-path: inset(34% 16% 0 16% round 999px 999px 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 999px 999px 0 0);
+  }
+}
+@keyframes settle {
+  from {
+    transform: scale(1.14);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.82);
+  }
+  45%,
+  55% {
+    transform: scale(1);
+  }
+}
+
+/* Hero window geometry (kept in sync with HomeHero.tsx). */
+.hero-frame {
+  --t: 84px;
+  --r: 5vw;
+  --b: 50svh;
+  --l: 5vw;
+  --rad: 45vw;
+  clip-path: inset(var(--t) var(--r) var(--b) var(--l) round var(--rad) var(--rad) 0 0);
+}
+@media (min-width: 768px) {
+  .hero-frame {
+    --t: 14vh;
+    --r: 5vw;
+    --b: 6vh;
+    --l: 52vw;
+    --rad: 21.5vw;
+  }
+}
+/*
+ * Window shutters: two porcelain panels slide apart to reveal a photo. They sit ON TOP of
+ * the image (never clip it), so the LCP image paints immediately at full size.
+ */
+.shutters {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  pointer-events: none;
+}
+.shutters > span {
+  flex: 1;
+  background: var(--color-porcelain);
+}
+.shutters > span:first-child {
+  animation: shutter-l 1.9s var(--ease-soft) 0.15s both;
+}
+.shutters > span:last-child {
+  animation: shutter-r 1.9s var(--ease-soft) 0.15s both;
+}
+@keyframes shutter-l {
+  from {
+    transform: translateX(-8%);
+  }
+  99% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-101%);
+    opacity: 0;
+  }
+}
+@keyframes shutter-r {
+  from {
+    transform: translateX(8%);
+  }
+  99% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(101%);
+    opacity: 0;
+  }
+}
+.hero-shutters {
+  top: var(--t);
+  right: var(--r);
+  bottom: var(--b);
+  left: var(--l);
+}
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+.anim-heading {
+  animation: heading-in 1.6s var(--ease-soft) var(--d, 0s) both;
+}
+.anim-fade {
+  animation: fade-in 1.4s var(--ease-soft) calc(var(--d, 0s) + 0.1s) both;
+}
+.anim-arch {
+  animation: arch-open 2.2s var(--ease-soft) 0.15s both;
+}
+.anim-settle {
+  animation: settle 2.8s var(--ease-soft) 0.15s both;
+}
+
+/* Area map: roads draw in, labels fade up, the pin breathes. */
+.map-draw {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 0;
+}
+[data-in="false"] .map-draw {
+  stroke-dashoffset: 1400;
+}
+[data-in="true"] .map-draw {
+  transition: stroke-dashoffset 3.2s var(--ease-soft);
+}
+[data-in="false"] .map-label {
+  opacity: 0.2;
+}
+.map-label {
+  transition: opacity 1.6s var(--ease-soft) 0.8s;
+}
+.map-pulse {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: pulse-ring 3s ease-out infinite;
+}
+
+/* FAQ disclosure */
+.faq summary {
+  list-style: none;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.7s var(--ease-soft),
+    content-visibility 0.7s allow-discrete;
+}
+.faq details[open]::details-content {
+  block-size: auto;
+}
+:root {
+  interpolate-size: allow-keywords;
+}
+
+/* ───────────────────────── Page transitions ───────────────────────── */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(.page-swap) {
+  animation-duration: 0s;
+}
+::view-transition-old(.page-swap) {
+  animation: 380ms var(--ease-soft) both vt-out;
+}
+::view-transition-new(.page-swap) {
+  animation: 800ms var(--ease-soft) 160ms both vt-in;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+::view-transition-group(.morph) {
+  animation-duration: 750ms;
+  animation-timing-function: var(--ease-soft);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-soft;
+}
+@keyframes via-soft {
+  40% {
+    filter: blur(2px);
+  }
+}
+
+/* ───────────────────────── Reduced motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
