@@ -4,7 +4,7 @@
 - Market / city: US – Dallas, TX (Uptown)
 - Languages: en (Spanish-speaking staff mentioned throughout)
 - Live URL: https://oriel-dental-demo.vercel.app
-- Repo: local only (git initialised; GitHub account/org still to be chosen)
+- Repo: https://github.com/dbs-media-demos/oriel-dental-demo (public, branch main)
 - Folder: DBS Media Portfolio/Demo Websites/dental
 - Stack: Next.js 16.3.6, React 19.2.8, Tailwind v4, GSAP 3.15 (ScrollTrigger, SplitText), Lenis 1.3
 - Palette: #F7F4EE porcelain, #EDE6DA linen, #1E2926 ink, #4E6B5C sage, #B9CBBE mist, #D8C2A3 sand, #F2D9A6 glow, #18221F night   Fonts: Fraunces (self-hosted, SOFT 100), Figtree
