@@ -42,7 +42,7 @@ export const site = {
     google: "https://google.com/maps",
   },
   /** Agency site (Scale by Noon). Single source of truth: swap here when the custom domain lands. */
-  agencyUrl: "https://scale-by-noon.vercel.app",
+  agencyUrl: "https://www.scalebynoon.com",
 } as const;
 
 export const fullAddress = `${site.address.street}, ${site.address.city}, ${site.address.region} ${site.address.postal}`;

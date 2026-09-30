@@ -1,6 +1,6 @@
 # Oriel Dental Studio (Scale by Noon demo)
 
-- Niche: Family & cosmetic dentistry         (matches scale-by-noon.vercel.app industry id: dental)
+- Niche: Family & cosmetic dentistry         (matches www.scalebynoon.com industry id: dental)
 - Market / city: US – Dallas, TX (Uptown)
 - Languages: en (Spanish-speaking staff mentioned throughout)
 - Live URL: https://oriel-dental-demo.vercel.app
