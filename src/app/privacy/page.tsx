@@ -13,7 +13,7 @@ const sections: { h: string; p: string[] }[] = [
   {
     h: "A note about this website",
     p: [
-      "Oriel Dental Studio is a fictional practice created by DBS Media as a website concept. Forms on this site do not send or store any information. Please don't enter real health details.",
+      "Oriel Dental Studio is a fictional practice created by Scale by Noon as a website concept. Forms on this site do not send or store any information. Please don't enter real health details.",
     ],
   },
   {

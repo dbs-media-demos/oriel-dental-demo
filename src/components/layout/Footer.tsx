@@ -104,8 +104,8 @@ export function Footer() {
               Privacy & HIPAA
             </Link>
             <span>Se habla español</span>
-            <a href={site.dbsMedia} className="hover:text-porcelain">
-              Design & development: DBS Media
+            <a href={site.agencyUrl} className="hover:text-porcelain">
+              Design & development: Scale by Noon
             </a>
           </div>
         </div>

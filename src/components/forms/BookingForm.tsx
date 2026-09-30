@@ -173,7 +173,7 @@ export function BookingForm() {
           ))}
         </ul>
         <p className="mt-10 rounded-2xl bg-sand-soft px-5 py-3 text-[0.9rem]">
-          This is a concept site by DBS Media, so nothing was actually sent. In a live build, this would reach the practice instantly.
+          This is a concept site by Scale by Noon, so nothing was actually sent. In a live build, this would reach the practice instantly.
         </p>
         <Link href="/" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-sage px-6 font-semibold text-porcelain">
           Back to home

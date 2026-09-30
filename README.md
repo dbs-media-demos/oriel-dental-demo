@@ -1,6 +1,6 @@
-# Oriel Dental Studio (DBS Media concept site)
+# Oriel Dental Studio (Scale by Noon concept site)
 
-A fictional family & cosmetic dental practice in Uptown Dallas, built by DBS Media as a portfolio demo. See `DEMO.md` for the handoff summary.
+A fictional family & cosmetic dental practice in Uptown Dallas, built by Scale by Noon as a portfolio demo. See `DEMO.md` for the handoff summary.
 
 ## Stack
 

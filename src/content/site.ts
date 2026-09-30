@@ -1,4 +1,4 @@
-/** Oriel Dental Studio: a fictional practice built as a DBS Media concept site. */
+/** Oriel Dental Studio: a fictional practice built as a Scale by Noon concept site. */
 
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://oriel-dental-demo.vercel.app").replace(/\/$/, "");
 export const absoluteUrl = (path = "/") => `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
@@ -41,7 +41,8 @@ export const site = {
     facebook: "https://facebook.com",
     google: "https://google.com/maps",
   },
-  dbsMedia: "https://dbs-media.com",
+  /** Agency site (Scale by Noon). Single source of truth: swap here when the custom domain lands. */
+  agencyUrl: "https://scale-by-noon.vercel.app",
 } as const;
 
 export const fullAddress = `${site.address.street}, ${site.address.city}, ${site.address.region} ${site.address.postal}`;

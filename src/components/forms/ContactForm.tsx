@@ -37,7 +37,7 @@ export function ContactForm() {
         <span aria-hidden className="mx-auto block h-16 w-12 rounded-t-full bg-sage" />
         <h2 className="display h-sm mt-6">Thank you, {v.name.split(" ")[0]}.</h2>
         <p className="lede mx-auto mt-3 max-w-md">We reply within one business hour, usually much sooner.</p>
-        <p className="mt-6 text-[0.85rem] text-ink-soft">Concept site by DBS Media: this form doesn&apos;t send anything.</p>
+        <p className="mt-6 text-[0.85rem] text-ink-soft">Concept site by Scale by Noon: this form doesn&apos;t send anything.</p>
       </div>
     );
   }
