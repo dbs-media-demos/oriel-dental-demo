@@ -7,9 +7,12 @@ import clsx from "clsx";
 import { Logo } from "@/components/brand/Logo";
 import { Button, PhoneIcon } from "@/components/ui/Button";
 import { OpenBadge } from "@/components/ui/OpenBadge";
-import { mainNav, site, fullAddress } from "@/content/site";
+import { mainNav } from "@/content/site";
+import { useBiz } from "@/components/preview/BizContext";
+import { telOf } from "@/lib/biz-core";
 
 export function Header() {
+  const biz = useBiz();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -94,9 +97,9 @@ export function Header() {
         </nav>
 
         <div className="relative z-10 flex items-center gap-2 sm:gap-3">
-          <a href={site.phoneHref} className="hidden items-center gap-2 px-2 text-[0.92rem] font-semibold text-ink lg:inline-flex">
+          <a href={telOf(biz)} className="hidden items-center gap-2 px-2 text-[0.92rem] font-semibold text-ink lg:inline-flex">
             <PhoneIcon />
-            {site.phone}
+            {biz.phoneDisplay}
           </a>
           <Button href="/book" className="hidden !min-h-11 !px-5 sm:inline-flex">
             Book a visit
@@ -144,9 +147,9 @@ export function Header() {
           </ul>
           <div className="mt-8 space-y-3 pb-32 text-ink-soft">
             <OpenBadge />
-            <p>{fullAddress}</p>
-            <a href={site.phoneHref} className="block text-lg font-semibold text-ink">
-              {site.phone}
+            <p>{biz.address.full}</p>
+            <a href={telOf(biz)} className="block text-lg font-semibold text-ink">
+              {biz.phoneDisplay}
             </a>
           </div>
         </nav>

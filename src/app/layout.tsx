@@ -1,17 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree } from "next/font/google";
 import localFont from "next/font/local";
-import { ViewTransition } from "react";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileBar } from "@/components/layout/MobileBar";
-import { DemoPill } from "@/components/layout/DemoPill";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Cursor } from "@/components/layout/Cursor";
-import { JsonLd } from "@/components/ui/JsonLd";
 import { site, siteUrl, noindex } from "@/content/site";
-import { dentistSchema, graph, websiteSchema } from "@/lib/schema";
 import { ogImageUrl } from "@/lib/seo";
 
 // Fraunces, self-hosted and instanced at weight 300 / SOFT 100 (optical size stays variable):
@@ -26,8 +19,22 @@ const fraunces = localFont({
   fallback: ["Iowan Old Style", "Georgia", "serif"],
 });
 
+// The instanced Fraunces above is Latin-only; č ć š ž đ (Serbian previews) come from this
+// latin-ext subset of the static Fraunces 300, listed first in --font-display.
+const frauncesExt = localFont({
+  variable: "--font-fraunces-ext",
+  display: "swap",
+  src: [
+    { path: "../assets/fonts/Fraunces-300-ext.woff2", weight: "300", style: "normal" },
+    { path: "../assets/fonts/Fraunces-300-ext-italic.woff2", weight: "300", style: "italic" },
+  ],
+  declarations: [{ prop: "unicode-range", value: "U+0100-024F, U+1E00-1EFF" }],
+  preload: false,
+  adjustFontFallback: false,
+});
+
 const figtree = Figtree({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-figtree",
   display: "swap",
 });
@@ -58,7 +65,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${figtree.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${frauncesExt.variable} ${figtree.variable}`}>
       <body>
         <a
           href="#main"
@@ -67,15 +74,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <SmoothScroll />
-        <Header />
-        <ViewTransition default="page-swap">
-          <main id="main">{children}</main>
-        </ViewTransition>
-        <Footer />
-        <MobileBar />
-        <DemoPill />
+        {/* Header, footer and the rest come from (site)/layout or for/[token]/layout (SiteChrome) */}
+        {children}
         <Cursor />
-        <JsonLd data={graph(dentistSchema(), websiteSchema())} />
       </body>
     </html>
   );

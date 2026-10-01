@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { HomeHero } from "@/components/sections/HomeHero";
 import { Intro } from "@/components/sections/Intro";
@@ -16,7 +17,6 @@ import { Marquee } from "@/components/ui/Marquee";
 import { FaqList } from "@/components/ui/FaqList";
 import { Reveal } from "@/components/ui/Reveal";
 import { Button, Arrow } from "@/components/ui/Button";
-import { JsonLd } from "@/components/ui/JsonLd";
 import { OpenBadge } from "@/components/ui/OpenBadge";
 import { img } from "@/content/images";
 import { services } from "@/content/services";
@@ -24,25 +24,19 @@ import { journey } from "@/content/journey";
 import { smileCases, caseTabs } from "@/content/gallery";
 import { homeFaqs } from "@/content/faqs";
 import { site, hours, fmtTime, fullAddress } from "@/content/site";
-import { buildMetadata } from "@/lib/seo";
-import { faqSchema, graph, offerCatalogSchema, webPageSchema } from "@/lib/schema";
+import { defaultBiz } from "@/lib/biz";
+import { L, type Biz } from "@/lib/biz-core";
+import { scrub } from "@/lib/scrub";
+import { PreviewMap } from "@/components/preview/PreviewMap";
 
-export const metadata = buildMetadata({
-  title: "Oriel Dental Studio | Calm Family & Cosmetic Dentist in Uptown Dallas",
-  absoluteTitle: true,
-  description: site.description,
-  path: "/",
-  eyebrow: "Uptown Dallas dentist",
-  keywords: ["dentist Uptown Dallas", "family dentist Dallas", "cosmetic dentist Dallas", "emergency dentist Uptown", "sedation dentist Dallas"],
-});
 
-const comforts: Comfort[] = [
+const comfortsFor = (biz: Biz): Comfort[] => [
   { title: "Weighted blankets", body: "Heavy, soft and warm. Most patients never give theirs back until the very end.", image: img.comfortBlanket },
   { title: "Noise-cancelling headphones", body: "Your playlist, a podcast or rain sounds. No drill noise, no small talk required.", image: img.comfortHeadphones },
   { title: "Your show on the ceiling", body: "Netflix, Hulu or Max on a screen above every chair. Pick up where you left off.", image: img.loungeTv },
   { title: "Tea, sparkling water, calm", body: "Lavender or mint tea in the lounge, and rooms that smell like eucalyptus, not a clinic.", image: img.comfortTea },
   { title: "A stop signal, always honored", body: "Raise your hand and we pause. Every time, no questions, no sighs.", image: img.dentistLaugh },
-  { title: "Nitrous & oral sedation", body: "For the truly nervous: a doctor with a Texas sedation permit and careful monitoring.", image: img.suiteWindow },
+  { title: "Nitrous & oral sedation", body: biz.preview ? "For the truly nervous: gentle sedation with careful monitoring." : "For the truly nervous: a doctor with a Texas sedation permit and careful monitoring.", image: img.suiteWindow },
 ];
 
 const rail: RailItem[] = [
@@ -56,17 +50,28 @@ const rail: RailItem[] = [
 ];
 
 const marqueeWords = ["Weighted blankets", "Evening hours", "3D scans, no goop", "Prices first", "Se habla español", "Same-day emergencies", "Saturday mornings", "Free parking"];
+// A preview doesn't promise Spanish or free parking for a business we haven't asked
+const previewMarquee = marqueeWords.filter((w) => w !== "Se habla español" && w !== "Free parking");
 
-export default function HomePage() {
+/**
+ * The homepage sections. The concept site renders them as they are; a personalised preview
+ * (/for/<token>) passes a real business: its name, hours, rating and a map of its address replace
+ * the fictional practice's, and the parts that only make sense for Oriel (its doctors, Uptown,
+ * US insurance on Serbian pages) step aside.
+ */
+export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; children?: ReactNode }) {
   const index = services.map((s) => ({ slug: s.slug, name: s.name, duration: s.duration, price: s.price.split(" · ")[0], tagline: s.tagline, image: s.image }));
+  const words = biz.preview ? previewMarquee : marqueeWords;
+  const sr = biz.lang === "sr";
 
   return (
     <>
+      {children}
       <HomeHero image={img.studioConsult} />
 
       <div className="border-y border-line bg-shell py-6">
         <Marquee speed={70}>
-          {marqueeWords.map((w) => (
+          {words.map((w) => (
             <span key={w} className="display flex items-center gap-10 pr-10 text-[clamp(1.4rem,2.4vw,2.2rem)] text-ink/80">
               {w}
               <span aria-hidden className="inline-block h-4 w-3 rounded-t-full bg-sand" />
@@ -75,7 +80,7 @@ export default function HomePage() {
         </Marquee>
       </div>
 
-      <Intro />
+      <Intro biz={biz} />
 
       {/* Treatments */}
       <section aria-labelledby="treatments-title" className="py-24 md:py-36">
@@ -118,7 +123,7 @@ export default function HomePage() {
             className="max-w-3xl"
           />
           <div className="mt-16 md:mt-24">
-            <Journey chapters={journey} />
+            <Journey chapters={journey.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
           </div>
         </div>
       </section>
@@ -165,7 +170,7 @@ export default function HomePage() {
             className="max-w-3xl"
           />
           <div className="mt-16">
-            <ComfortMenu items={comforts} />
+            <ComfortMenu items={comfortsFor(biz)} />
           </div>
           <Reveal className="mt-14">
             <Link href="/services/sedation-dentistry" className="link-underline font-semibold text-sage-deep">
@@ -175,7 +180,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Team */}
+      {/* Team (the fictional doctors: left out of previews) */}
+      {!biz.preview && (
       <section aria-labelledby="team-title" className="py-24 md:py-36">
         <div className="container-x">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -200,6 +206,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Office tour rail */}
       <OfficeRail
@@ -210,7 +217,7 @@ export default function HomePage() {
             <h2 className="display h-md mt-5">
               Every chair <em>faces a window.</em>
             </h2>
-            <p className="lede mt-5">A second-floor studio on Linden Row, designed with an architect, not a dental catalog.</p>
+            <p className="lede mt-5">{biz.preview ? "A studio designed with an architect, not a dental catalog." : "A second-floor studio on Linden Row, designed with an architect, not a dental catalog."}</p>
             <Link href="/office-tour" className="link-underline mt-6 inline-block font-semibold text-sage-deep">
               Take the full tour →
             </Link>
@@ -230,21 +237,29 @@ export default function HomePage() {
               </>
             }
           />
-          <Reveal>
-            <RatingSummary />
-          </Reveal>
+          {biz.rating && (
+            <Reveal>
+              <RatingSummary rating={biz.rating} />
+            </Reveal>
+          )}
         </div>
         <div className="mt-16">
-          <ReviewMarquee />
+          <ReviewMarquee scrubFor={biz} />
+          {biz.preview && (
+            <p className="container-x mt-8 text-[0.95rem] text-ink-soft">
+              Sample reviews. On your live site this shows your latest Google reviews, updated automatically.
+            </p>
+          )}
         </div>
         <div className="container-x mt-12">
           <Link href="/reviews" className="link-underline font-semibold text-sage-deep">
-            Read all {site.rating.count} reviews →
+            {biz.rating ? L(biz, `Read all ${biz.rating.count} reviews →`, `Sve recenzije (${biz.rating.count}) →`) : "Read all reviews →"}
           </Link>
         </div>
       </section>
 
-      {/* Insurance */}
+      {/* Insurance (US plans: not on Serbian previews) */}
+      {!sr && (
       <section aria-labelledby="insurance-title" className="bg-shell py-24 md:py-36">
         <div className="container-x grid gap-14 lg:grid-cols-2 lg:gap-24">
           <SectionIntro
@@ -262,8 +277,12 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* Location */}
+      {biz.preview ? (
+        <PreviewMap biz={biz} />
+      ) : (
       <section aria-labelledby="visit-title" className="py-24 md:py-36">
         <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
           <div>
@@ -300,13 +319,14 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* FAQ */}
       <section aria-labelledby="faq-title" className="pb-24 md:pb-36">
         <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-24">
           <SectionIntro id="faq-title" eyebrow="Questions" title={<>Good to know</>} size="h-md" />
           <div>
-            <FaqList items={homeFaqs} />
+            <FaqList items={homeFaqs.map((f) => ({ ...f, a: scrub(f.a, biz) }))} />
             <Link href="/faq" className="link-underline mt-8 inline-block font-semibold text-sage-deep">
               All frequently asked questions →
             </Link>
@@ -314,15 +334,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <FinalCta />
+      <FinalCta biz={biz} />
 
-      <JsonLd
-        data={graph(
-          webPageSchema({ path: "/", name: "Oriel Dental Studio", description: site.description }),
-          faqSchema(homeFaqs),
-          offerCatalogSchema(services),
-        )}
-      />
     </>
   );
 }

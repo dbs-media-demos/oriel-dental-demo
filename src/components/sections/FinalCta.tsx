@@ -2,9 +2,19 @@ import { AmbientVideo } from "@/components/ui/AmbientVideo";
 import { Button, Arrow, PhoneIcon } from "@/components/ui/Button";
 import { SplitReveal, Reveal } from "@/components/ui/Reveal";
 import { site } from "@/content/site";
+import { defaultBiz } from "@/lib/biz";
+import { telOf, type Biz } from "@/lib/biz-core";
 
 /** Closing call to action over a golden-hour leaf-shadow loop. */
-export function FinalCta({ title = "Your calmest dental visit starts here.", eyebrow = "New patients welcome" }: { title?: string; eyebrow?: string }) {
+export function FinalCta({
+  title = "Your calmest dental visit starts here.",
+  eyebrow = "New patients welcome",
+  biz = defaultBiz,
+}: {
+  title?: string;
+  eyebrow?: string;
+  biz?: Biz;
+}) {
   return (
     <section aria-labelledby="cta-title" className="px-3 pb-3 md:px-5 md:pb-5">
       <div className="relative isolate overflow-hidden rounded-t-[min(40vw,28rem)] rounded-b-[2rem] bg-sand-soft">
@@ -25,9 +35,11 @@ export function FinalCta({ title = "Your calmest dental visit starts here.", eye
               <Button href="/book" icon={<Arrow />}>
                 Book online
               </Button>
-              <Button href={site.phoneHref} variant="ghost" icon={<PhoneIcon />} className="bg-porcelain/50">
-                {site.phone}
-              </Button>
+              {biz.phone && (
+                <Button href={telOf(biz)!} variant="ghost" icon={<PhoneIcon />} className="bg-porcelain/50">
+                  {biz.phoneDisplay}
+                </Button>
+              )}
             </div>
           </Reveal>
         </div>

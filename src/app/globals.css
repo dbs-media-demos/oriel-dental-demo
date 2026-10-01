@@ -17,7 +17,7 @@
   --color-night: #18221f;
   --color-line: rgb(30 41 38 / 0.12);
 
-  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-display: var(--font-fraunces-ext), var(--font-fraunces), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);

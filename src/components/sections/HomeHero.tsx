@@ -7,13 +7,15 @@ import { Button, PhoneIcon, Arrow } from "@/components/ui/Button";
 import { OpenBadge } from "@/components/ui/OpenBadge";
 import { DappledLight } from "@/components/fx/DappledLight";
 import type { Img } from "@/content/images";
-import { site } from "@/content/site";
+import { useBiz } from "@/components/preview/BizContext";
+import { num, telOf } from "@/lib/biz-core";
 
 /**
  * The arched window. CSS paints it on first frame (and opens it from a slit); on scroll,
  * GSAP widens the arch until the studio fills the screen.
  */
 export function HomeHero({ image }: { image: Img }) {
+  const biz = useBiz();
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -86,15 +88,23 @@ export function HomeHero({ image }: { image: Img }) {
             <div className="md:max-w-[48%]">
               <div className="anim-fade flex flex-wrap items-center gap-3" style={{ "--d": "0.1s" } as React.CSSProperties}>
                 <OpenBadge />
-                <span className="eyebrow hidden text-ink-soft sm:inline">Uptown Dallas</span>
+                <span className="eyebrow hidden text-ink-soft sm:inline">{biz.preview ? biz.area : "Uptown Dallas"}</span>
               </div>
               <h1 id="hero-title" className="display mt-5 text-[clamp(3.1rem,6.5vw,7.6rem)] text-ink md:mt-7">
-                <span className="anim-heading block" style={{ "--d": "0.2s" } as React.CSSProperties}>
-                  Dentistry,
-                </span>
-                <span className="anim-heading block" style={{ "--d": "0.35s" } as React.CSSProperties}>
-                  in a <em className="text-sage">better light.</em>
-                </span>
+                {biz.tagline ? (
+                  <span className="anim-heading block" style={{ "--d": "0.2s" } as React.CSSProperties}>
+                    {biz.tagline}
+                  </span>
+                ) : (
+                  <>
+                    <span className="anim-heading block" style={{ "--d": "0.2s" } as React.CSSProperties}>
+                      Dentistry,
+                    </span>
+                    <span className="anim-heading block" style={{ "--d": "0.35s" } as React.CSSProperties}>
+                      in a <em className="text-sage">better light.</em>
+                    </span>
+                  </>
+                )}
               </h1>
               <p className="anim-fade lede mt-5 hidden max-w-[34rem] sm:block md:mt-8" style={{ "--d": "0.6s" } as React.CSSProperties}>
                 A calm, daylight-filled studio for families, nervous patients and natural-looking cosmetic work. Same-day emergencies, evening hours,
@@ -104,22 +114,31 @@ export function HomeHero({ image }: { image: Img }) {
                 <Button href="/book" icon={<Arrow />}>
                   Book your first visit
                 </Button>
-                <Button href={site.phoneHref} variant="ghost" icon={<PhoneIcon />} className="hidden sm:inline-flex">
-                  {site.phone}
-                </Button>
+                {biz.phone && (
+                  <Button href={telOf(biz)!} variant="ghost" icon={<PhoneIcon />} className="hidden sm:inline-flex">
+                    {biz.phoneDisplay}
+                  </Button>
+                )}
               </div>
-              <div className="anim-fade mt-6 flex items-center gap-3 text-[0.9rem] text-ink-soft md:mt-10" style={{ "--d": "0.9s" } as React.CSSProperties}>
-                <span className="tracking-[0.2em] text-sage" aria-hidden>
-                  ★★★★★
-                </span>
-                <span>
-                  <strong className="font-semibold text-ink">{site.rating.value}</strong> from {site.rating.count} Google reviews
-                </span>
-                <span className="hidden text-ink/30 lg:inline" aria-hidden>
-                  ·
-                </span>
-                <span className="hidden lg:inline">Se habla español</span>
-              </div>
+              {biz.rating && (
+                <div className="anim-fade mt-6 flex items-center gap-3 text-[0.9rem] text-ink-soft md:mt-10" style={{ "--d": "0.9s" } as React.CSSProperties}>
+                  <span className="tracking-[0.2em] text-sage" aria-hidden>
+                    ★★★★★
+                  </span>
+                  <span>
+                    <strong className="font-semibold text-ink">{num(biz, biz.rating.value)}</strong>{" "}
+                    {biz.lang === "sr" ? `· ${biz.rating.count} Google recenzija` : `from ${biz.rating.count} Google reviews`}
+                  </span>
+                  {!biz.preview && (
+                    <>
+                      <span className="hidden text-ink/30 lg:inline" aria-hidden>
+                        ·
+                      </span>
+                      <span className="hidden lg:inline">Se habla español</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

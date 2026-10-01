@@ -2,6 +2,8 @@ import clsx from "clsx";
 import { Marquee } from "@/components/ui/Marquee";
 import { reviews, ratingBreakdown, type Review } from "@/content/reviews";
 import { site } from "@/content/site";
+import { scrub } from "@/lib/scrub";
+import type { Biz } from "@/lib/biz-core";
 
 export function Stars({ n = 5, className }: { n?: number; className?: string }) {
   return (
@@ -49,7 +51,7 @@ export function ReviewCard({ r, className }: { r: Review; className?: string }) 
   );
 }
 
-export function RatingSummary({ className }: { className?: string }) {
+export function RatingSummary({ className, rating = site.rating }: { className?: string; rating?: { value: number; count: number } }) {
   return (
     <div className={clsx("rounded-3xl bg-shell p-8 ring-1 ring-line", className)}>
       <div className="flex items-center gap-3">
@@ -57,10 +59,10 @@ export function RatingSummary({ className }: { className?: string }) {
         <span className="font-semibold">Google reviews</span>
       </div>
       <div className="mt-6 flex items-end gap-4">
-        <span className="display text-[4.5rem] leading-none">{site.rating.value}</span>
+        <span className="display text-[4.5rem] leading-none">{rating.value}</span>
         <span className="pb-2">
           <Stars />
-          <span className="mt-1 block text-[0.9rem] text-ink-soft">{site.rating.count} reviews</span>
+          <span className="mt-1 block text-[0.9rem] text-ink-soft">{rating.count} reviews</span>
         </span>
       </div>
       <dl className="mt-6 space-y-2">
@@ -70,7 +72,7 @@ export function RatingSummary({ className }: { className?: string }) {
             <dd className="h-1.5 overflow-hidden rounded-full bg-linen">
               <span className="block h-full rounded-full bg-sage" style={{ width: `${Math.max(1, b.share * 100)}%` }} />
             </dd>
-            <dd className="text-right text-ink-soft tabular-nums">{Math.round(b.share * site.rating.count)}</dd>
+            <dd className="text-right text-ink-soft tabular-nums">{Math.round(b.share * rating.count)}</dd>
           </div>
         ))}
       </dl>
@@ -79,11 +81,12 @@ export function RatingSummary({ className }: { className?: string }) {
 }
 
 /** Two slow, opposite-moving rows of review cards. */
-export function ReviewMarquee() {
-  const half = Math.ceil(reviews.length / 2);
+export function ReviewMarquee({ scrubFor }: { scrubFor?: Pick<Biz, "preview" | "shortName"> } = {}) {
+  const list = scrubFor ? reviews.map((r) => ({ ...r, text: scrub(r.text, scrubFor), area: scrubFor.preview ? "" : r.area })) : reviews;
+  const half = Math.ceil(list.length / 2);
   return (
     <div className="space-y-6 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-      {[reviews.slice(0, half), reviews.slice(half)].map((row, i) => (
+      {[list.slice(0, half), list.slice(half)].map((row, i) => (
         <Marquee key={i} reverse={i === 1} speed={90}>
           {row.map((r) => (
             <ReviewCard key={r.name} r={r} className="mr-6 w-[21rem] shrink-0 sm:w-[26rem]" />

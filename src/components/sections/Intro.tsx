@@ -3,15 +3,39 @@ import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { img } from "@/content/images";
 import { site } from "@/content/site";
+import { defaultBiz } from "@/lib/biz";
+import { L, openDays, type Biz } from "@/lib/biz-core";
 
-const stats = [
+type Stat = { value: number; decimals?: number; suffix?: string; prefix?: string; label: string };
+
+const conceptStats: Stat[] = [
   { value: site.rating.value, decimals: 1, suffix: "★", label: `Average from ${site.rating.count} Google reviews` },
   { value: 60, suffix: " min", label: "Cleanings are a full hour, never rushed" },
   { value: 12, suffix: "", label: "Years of calm dentistry in Uptown" },
   { value: 0, prefix: "$", label: "Surprise bills. Prices come before treatment" },
 ];
 
-export function Intro() {
+/** A preview states only what's true of the real practice (its rating and opening days). */
+function previewStats(biz: Biz): Stat[] {
+  const days = openDays(biz);
+  return [
+    ...(biz.rating ? [{ value: biz.rating.value, decimals: 1, suffix: "★", label: L(biz, `Average from ${biz.rating.count} Google reviews`, `Prosek iz ${biz.rating.count} Google recenzija`) }] : []),
+    { value: 60, suffix: " min", label: "Cleanings are a full hour, never rushed" },
+    ...(days ? [{ value: days, suffix: "", label: L(biz, "Days a week we're open for you", "Dana nedeljno radimo za vas") }] : []),
+    { value: 0, prefix: biz.lang === "sr" ? "" : "$", suffix: biz.lang === "sr" ? " din" : "", label: "Surprise bills. Prices come before treatment" },
+  ];
+}
+
+const introText = {
+  en: (name: string) =>
+    `We built ${name} for people who'd rather be anywhere but the dentist. Rooms full of daylight, appointments that never feel rushed, a stop signal that's always honored, and a clear plan with prices before anything happens.`,
+  sr: () =>
+    "Ovu ordinaciju smo napravili za ljude koji bi radije bili bilo gde nego kod zubara. Prostorije pune dnevnog svetla, termini bez žurbe, znak za pauzu koji uvek poštujemo i jasan plan sa cenama pre nego što bilo šta počne.",
+};
+
+export function Intro({ biz = defaultBiz }: { biz?: Biz }) {
+  const stats = biz.preview ? previewStats(biz) : conceptStats;
+  const name = biz.preview ? biz.shortName : "Oriel";
   return (
     <section aria-labelledby="intro-title" className="relative py-28 md:py-44">
       <div className="container-x grid items-start gap-16 lg:grid-cols-[1fr_1.35fr] lg:gap-24">
@@ -29,14 +53,12 @@ export function Intro() {
         </div>
 
         <div>
-          <p className="eyebrow text-sage">Why Oriel</p>
+          <p className="eyebrow text-sage">{L(biz, `Why ${name}`, "Zašto mi")}</p>
           <h2 id="intro-title" className="sr-only">
-            Why patients choose Oriel Dental Studio
+            {L(biz, `Why patients choose ${biz.preview ? biz.name : "Oriel Dental Studio"}`, `Zašto pacijenti biraju ${biz.name}`)}
           </h2>
-          <ScrubWords
-            className="display mt-8 text-[clamp(1.9rem,3.6vw,3.4rem)] leading-[1.12]"
-            text="We built Oriel for people who'd rather be anywhere but the dentist. Rooms full of daylight, appointments that never feel rushed, a stop signal that's always honored, and a clear plan with prices before anything happens."
-          />
+          {/* ScrubWords splits words while rendering, so the Serbian is written here, not translated later */}
+          <ScrubWords className="display mt-8 text-[clamp(1.9rem,3.6vw,3.4rem)] leading-[1.12]" text={biz.lang === "sr" ? introText.sr() : introText.en(name)} />
           <Reveal as="dl" stagger={0.12} className="mt-16 grid grid-cols-2 gap-x-8 gap-y-12 border-t border-line pt-12">
             {stats.map((s) => (
               <div key={s.label}>

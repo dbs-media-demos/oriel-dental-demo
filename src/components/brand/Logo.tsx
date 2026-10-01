@@ -1,4 +1,7 @@
+"use client";
+
 import clsx from "clsx";
+import { useBiz } from "@/components/preview/BizContext";
 
 /** Shared geometry, reused by the favicon, OG image and manifest icon. */
 export const MARK = {
@@ -22,14 +25,21 @@ export function Mark({ className, sun = "var(--color-glow)" }: { className?: str
 }
 
 export function Logo({ className, compact }: { className?: string; compact?: boolean }) {
+  const biz = useBiz();
+  // A preview sets the business's own name in the same type; long names step down a size
+  const long = biz.preview && biz.shortName.length > 14;
   return (
     <span className={clsx("inline-flex items-center gap-2.5", className)}>
       <Mark className="h-9 w-auto shrink-0" />
       <span className="flex flex-col leading-none">
-        <span className="display text-[1.7rem] tracking-[-0.02em]" style={{ lineHeight: 0.9 }}>
-          Oriel
+        <span className={clsx("display block max-w-[14rem] truncate tracking-[-0.02em] sm:max-w-[20rem]", long ? "text-[1.25rem]" : "text-[1.7rem]")} style={{ lineHeight: 0.9 }}>
+          {biz.preview ? biz.shortName : "Oriel"}
         </span>{" "}
-        {!compact && <span className="mt-1 text-[0.58rem] font-semibold tracking-[0.34em] uppercase opacity-70">Dental Studio</span>}
+        {!compact && (
+          <span className="mt-1 text-[0.58rem] font-semibold tracking-[0.34em] uppercase opacity-70">
+            {biz.preview ? (biz.lang === "sr" ? "Stomatološka ordinacija" : "Dental") : "Dental Studio"}
+          </span>
+        )}
       </span>
     </span>
   );
