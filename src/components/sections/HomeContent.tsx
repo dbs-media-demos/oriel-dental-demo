@@ -60,23 +60,29 @@ const previewMarquee = marqueeWords.filter((w) => w !== "Se habla español" && w
  * (/for/<token>) passes a real business: its name, hours, rating and a map of its address replace
  * the fictional practice's, and the parts that only make sense for Oriel (its doctors, Uptown,
  * US insurance on Serbian pages) step aside. A Serbian preview also leaves out what Health Care Law
- * art. 53 rules out as we read it: the smile gallery, result stories, promises and comparisons.
+ * art. 53 rules out as we read it: the smile gallery, result stories, promises and comparisons, and
+ * what reads as a lure: the gift step, free consultations and free first visits.
  *
  * `order` only takes effect on phones (.home-flow is a column there): first the things a patient
  * looks for, in the order this niche needs them; desktop reads top to bottom as written.
  */
 export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; children?: ReactNode }) {
   const sr = biz.lang === "sr";
+  // English leads with the free offer where there is one; Serbian shows the ordinary price instead
+  const firstPrice = (price: string) => {
+    const parts = price.split(" · ");
+    return sr ? (parts.find((p) => !/\$0\b|\bfree\b/i.test(p)) ?? "") : parts[0];
+  };
   const index = services.map((s) => ({
     slug: s.slug,
     name: tr(biz, s.name),
     duration: tr(biz, s.duration),
-    price: tr(biz, s.price.split(" · ")[0]),
-    tagline: s.tagline,
-    image: s.image,
+    price: tr(biz, firstPrice(s.price)),
+    image: s.image.src,
   }));
-  const prices = services.map((s) => ({ slug: s.slug, name: s.name, duration: s.duration, price: s.price.split(" · ")[0] }));
+  const prices = services.map((s) => ({ slug: s.slug, name: s.name, duration: s.duration, price: firstPrice(s.price) }));
   const words = biz.preview ? previewMarquee : marqueeWords;
+  const chapters = sr ? journey.filter((c) => c.kicker !== "Gift") : journey;
 
   return (
     <div className="home-flow">
@@ -120,7 +126,7 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
               </Button>
             </Reveal>
           </div>
-          <div className="mt-16 phone:mt-4">
+          <div className="rest-first mt-16 phone:mt-4">
             <TreatmentIndex items={index} />
           </div>
           <Link href="/services" className="link-underline mt-4 hidden font-semibold text-sage-deep phone:inline-block">
@@ -136,15 +142,25 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
             id="journey-title"
             eyebrow="Your first visit"
             title={
-              <>
-                Five calm steps, <em>zero surprises.</em>
-              </>
+              sr ? (
+                <>
+                  Četiri mirna koraka, <em>jasno od početka.</em>
+                </>
+              ) : (
+                <>
+                  Five calm steps, <em>zero surprises.</em>
+                </>
+              )
             }
-            lede="From booking to the gift bag, here is exactly what your first visit feels like. About 90 minutes, and nothing happens without your say-so."
+            lede={L(
+              biz,
+              "From booking to the gift bag, here is exactly what your first visit feels like. About 90 minutes, and nothing happens without your say-so.",
+              "Od zakazivanja do plana sa cenama, evo kako tačno izgleda vaša prva poseta. Oko 90 minuta, i ništa se ne radi bez vašeg odobrenja.",
+            )}
             className="max-w-3xl"
           />
           <div className="mt-16 md:mt-24 phone:mt-4">
-            <Journey chapters={journey.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
+            <Journey chapters={chapters.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
           </div>
         </div>
       </section>

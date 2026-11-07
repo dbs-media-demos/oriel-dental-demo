@@ -11,7 +11,8 @@ export function openStatus(): { open: boolean; text: string } {
   return statusOf(defaultBiz) ?? { open: false, text: "Closed" };
 }
 
-// Re-check once a minute. The server snapshot renders a neutral label (no hydration mismatch).
+// Re-check once a minute. The server snapshot renders a neutral label (no hydration mismatch). A preview is rendered
+// per request, so it has the live status from the first byte: the text never swaps and the hero never jumps.
 const subscribe = (cb: () => void) => {
   const id = window.setInterval(cb, 60_000);
   return () => window.clearInterval(id);
@@ -23,7 +24,7 @@ export function OpenBadge({ className, tone = "light" }: { className?: string; t
   const tick = useSyncExternalStore(subscribe, minute, () => 0);
   // A preview of a business whose hours we don't know: no badge rather than a made-up one
   if (!biz.hours) return null;
-  const status = tick ? statusOf(biz) : null;
+  const status = tick || biz.preview ? statusOf(biz) : null;
   const snap = status ? "1" : "";
   const text = status?.text ?? biz.hoursSummary;
   const open = !!status?.open;

@@ -47,7 +47,6 @@ export const reviews: Review[] = [
     when: "2 months ago",
     date: "2026-07-30",
     treatment: "Kids' dentistry",
-    neutral: true,
     text: "Dr. Delgado spoke Spanish with my mom and English with our kids, all in the same appointment. Our four-year-old now asks when she can go back and pick from the treasure drawer.",
   },
   {

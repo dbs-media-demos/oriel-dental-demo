@@ -37,6 +37,14 @@
   descent-override: 27.13%;
   line-gap-override: 0%;
 }
+@font-face {
+  font-family: "Fraunces Desktop Fallback";
+  src: local("Times New Roman"), local("Times"), local("Liberation Serif");
+  size-adjust: 92.5%;
+  ascent-override: 106%;
+  descent-override: 27.6%;
+  line-gap-override: 0%;
+}
 
 /* ───────────────────────── Oriel design tokens ───────────────────────── */
 @theme {
@@ -442,6 +450,67 @@ body::after {
   }
   .home-flow section:not(.flush-y, [data-hero]) {
     padding-block: 1.875rem;
+  }
+
+  /* The first layout was the whole page at once (a 1.2 s freeze on a slow phone). Sections below the first screens
+     rest at their usual height: no style or layout until the first touch (RestWake), then only when near the screen. */
+  .home-flow > :is(.order-4, .order-5, .order-6, .order-7, .order-8, .order-9, .order-10, .order-11, .order-12, .order-13, .order-14),
+  main ~ footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto var(--rest-h, 700px);
+  }
+  /* The treatment list starts just below the first screen, so it wakes first, when the browser is idle after load. */
+  .rest-first {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 610px;
+  }
+  /* Only the review cards near the screen, not the whole stack. */
+  .rest-card > * {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 225px;
+  }
+  @media (scripting: enabled) {
+    html:not(.woke-first) .rest-first,
+    html:not(.woke) .home-flow > :is(.order-4, .order-5, .order-6, .order-7, .order-8, .order-9, .order-10, .order-11, .order-12, .order-13, .order-14),
+    html:not(.woke) main ~ footer {
+      content-visibility: hidden;
+    }
+  }
+  .home-flow > .order-4 {
+    --rest-h: 1220px;
+  }
+  .home-flow > .order-5 {
+    --rest-h: 570px;
+  }
+  .home-flow > .order-6 {
+    --rest-h: 360px;
+  }
+  .home-flow > .order-7 {
+    --rest-h: 740px;
+  }
+  .home-flow > .order-8 {
+    --rest-h: 685px;
+  }
+  .home-flow > .order-9 {
+    --rest-h: 670px;
+  }
+  .home-flow > .order-10 {
+    --rest-h: 495px;
+  }
+  .home-flow > .order-11 {
+    --rest-h: 735px;
+  }
+  .home-flow > .order-12 {
+    --rest-h: 500px;
+  }
+  .home-flow > .order-13 {
+    --rest-h: 400px;
+  }
+  .home-flow > .order-14 {
+    --rest-h: 400px;
+  }
+  main ~ footer {
+    --rest-h: 810px;
   }
 
   /* First screen: paints whole, nothing faded in, and the next section peeks over the bar. */

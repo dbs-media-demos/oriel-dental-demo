@@ -61,7 +61,7 @@ export const sr: Record<string, string> = {
   "$145 cleaning": "Čišćenje 4.500 din",
   "Cosmetic dentistry": "Estetska stomatologija",
   "45 min consult": "Konsultacije 45 min",
-  "Consult $0": "Konsultacije besplatne",
+  "bonding from $350": "Bonding od 12.000 din",
   "Teeth whitening": "Izbeljivanje zuba",
   "90 min in-office": "90 min u ordinaciji",
   "$395 take-home": "Kućno izbeljivanje 25.000 din",
@@ -82,14 +82,9 @@ export const sr: Record<string, string> = {
   "Nitrous $75": "Azot-oksidul 3.000 din",
   "Kids' dentistry": "Dečja stomatologija",
   "30–45 min": "30–45 min",
-  "First visit free under 3": "Prva poseta besplatna do 3. godine",
 
   // ── Your first visit ──
   "Your first visit": "Vaša prva poseta",
-  "Five calm steps,": "Pet mirnih koraka,",
-  "zero surprises.": "jasno od početka.",
-  "From booking to the gift bag, here is exactly what your first visit feels like. About 90 minutes, and nothing happens without your say-so.":
-    "Od zakazivanja do poklon-kesice, evo kako tačno izgleda vaša prva poseta. Oko 90 minuta, i ništa se ne radi bez vašeg odobrenja.",
   "Chunky knit blanket draped over a soft sofa": "Pleteno ćebe prebačeno preko mekane sofe",
   "Dentist using a digital intraoral scanner on a smiling patient": "Stomatolog skenira zube nasmejane pacijentkinje digitalnim skenerom",
   "Dentist explaining a treatment plan to a relaxed patient in the chair": "Stomatolog objašnjava plan lečenja opuštenoj pacijentkinji",
@@ -122,13 +117,6 @@ export const sr: Record<string, string> = {
   "Written options": "Opcije na papiru",
   "Insurance estimate": "Cene unapred",
   "0% financing": "Plaćanje na rate",
-  Gift: "Poklon",
-  "And a little something to take home.": "I mali poklon za kući.",
-  "Every new patient leaves with our welcome kit: a bamboo brush, silk floss, a lip balm we love, and $50 toward professional whitening.":
-    "Svaki novi pacijent dobija naš paket dobrodošlice: četkicu od bambusa, svileni konac, balzam za usne koji volimo i 5.000 din popusta na profesionalno izbeljivanje.",
-  "Bamboo brush": "Četkica od bambusa",
-  "Silk floss": "Svileni konac",
-  "$50 whitening credit": "5.000 din za izbeljivanje",
 
   // ── Smile gallery ──
   "Drag the arch.": "Pomerite luk.",
@@ -239,9 +227,6 @@ export const sr: Record<string, string> = {
     "Šest ljuskica. Probnu verziju sam nosila nedelju dana i dva puta smo menjali dužinu. Prijatelji kažu da izgledam odmorno, a niko nije pogodio zašto. Vredi svakog dinara.",
   "Priya S.": "Ivana S.",
   "3 weeks ago": "pre 3 nedelje",
-  "The dentist spoke Spanish with my mom and English with our kids, all in the same appointment. Our four-year-old now asks when she can go back and pick from the treasure drawer.":
-    "Doktorka je bila divna i sa mojom mamom i sa našom decom, sve u istom terminu. Naša četvorogodišnjakinja sada pita kad ponovo idemo da bira poklon iz fioke sa blagom.",
-  "Ana & Luis G.": "Ana i Luka G.",
   "2 months ago": "pre 2 meseca",
   "Broke a crown on a Saturday morning before a wedding. Called at 8:10, was in the chair at 9:30, and walked out with a temporary that got me through the toasts. Lifesavers.":
     "Slomila mi se krunica u subotu ujutru, pred venčanje. Pozvao sam u 8:10, u 9:30 sam već bio u stolici, a izašao sam sa privremenom krunicom koja je izdržala celu svadbu. Spasioci.",

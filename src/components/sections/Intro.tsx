@@ -70,9 +70,9 @@ export function Intro({ biz = defaultBiz }: { biz?: Biz }) {
               </div>
             </div>
           </div>
-          <p className="eyebrow text-sage">{L(biz, `Why ${name}`, "Zašto mi")}</p>
+          <p className="eyebrow text-sage">{L(biz, `Why ${name}`, "O ordinaciji")}</p>
           <h2 id="intro-title" className="sr-only">
-            {L(biz, `Why patients choose ${biz.preview ? biz.name : "Oriel Dental Studio"}`, `Zašto pacijenti biraju ${biz.name}`)}
+            {L(biz, `Why patients choose ${biz.preview ? biz.name : "Oriel Dental Studio"}`, "O ordinaciji")}
           </h2>
           {/* ScrubWords splits words while rendering, so the Serbian is written here, not translated later */}
           <ScrubWords className="display mt-8 text-[clamp(1.9rem,3.6vw,3.4rem)] leading-[1.12] phone:mt-2.5 phone:text-[1.25rem] phone:leading-[1.22]" text={biz.lang === "sr" ? introText.sr() : introText.en(name)} />

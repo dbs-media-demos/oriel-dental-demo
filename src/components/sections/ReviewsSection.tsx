@@ -112,7 +112,7 @@ export function ReviewStack({ scrubFor }: { scrubFor?: Pick<Biz, "preview" | "sh
   const stacked = list.length <= 5 ? list.length : 3;
   return (
     <div className="container-x">
-      <div className="grid gap-2.5">
+      <div className="rest-card grid gap-2.5">
         {list.slice(0, stacked).map((r) => (
           <ReviewCard key={r.name} r={r} />
         ))}

@@ -5,9 +5,8 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import clsx from "clsx";
 import { useDesktopGSAP, isTouch, prefersReducedMotion } from "@/lib/motion";
-import type { Img } from "@/content/images";
 
-export type IndexItem = { slug: string; name: string; duration: string; price: string; tagline: string; image: Img };
+export type IndexItem = { slug: string; name: string; duration: string; price: string; image: string };
 
 /**
  * Editorial treatment list. On desktop an arch-shaped photo floats after the cursor
@@ -52,8 +51,8 @@ export function TreatmentIndex({ items }: { items: IndexItem[] }) {
               onFocus={() => setActive(i)}
               className="group grid grid-cols-[4.5rem_1fr] items-center gap-4 py-5 md:grid-cols-[3rem_1fr_auto] md:gap-8 md:py-7 phone:grid-cols-[2.75rem_1fr] phone:gap-3 phone:py-1.5"
             >
-              <span className="relative aspect-square overflow-hidden rounded-t-full rounded-b-lg md:hidden phone:block">
-                <Image src={s.image.src} alt="" fill sizes="72px" className="object-cover" placeholder="blur" blurDataURL={s.image.blur} />
+              <span className="relative aspect-square overflow-hidden rounded-t-full rounded-b-lg bg-linen md:hidden phone:block">
+                <Image src={s.image} alt="" fill sizes="72px" className="object-cover" />
               </span>
               <span className="hidden text-sm text-ink-soft tabular-nums md:block phone:hidden">{String(i + 1).padStart(2, "0")}</span>
               <span className="min-w-0">
@@ -91,7 +90,7 @@ export function TreatmentIndex({ items }: { items: IndexItem[] }) {
           {items.map((s, i) => (
             <Image
               key={s.slug}
-              src={s.image.src}
+              src={s.image}
               alt=""
               fill
               sizes="272px"

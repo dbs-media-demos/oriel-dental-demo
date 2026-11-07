@@ -18,7 +18,9 @@ const fraunces = localFont({
     { path: "../assets/fonts/Fraunces-300-soft.woff2", weight: "300", style: "normal" },
     { path: "../assets/fonts/Fraunces-300-soft-italic.woff2", weight: "300", style: "italic" },
   ],
-  fallback: ["Iowan Old Style", "Georgia", "serif"],
+  // Globals.css: sized to break lines like Fraunces, so the hero keeps its height when the font arrives
+  adjustFontFallback: false,
+  fallback: ["Fraunces Desktop Fallback", "Iowan Old Style", "Georgia", "serif"],
 });
 
 // The instanced Fraunces above is Latin-only; č ć š ž đ (Serbian previews) come from this
