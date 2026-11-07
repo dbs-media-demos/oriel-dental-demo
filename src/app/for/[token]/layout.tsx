@@ -17,7 +17,7 @@ export default async function PreviewLayout({ children, params }: { children: Re
   const biz = await previewBiz(token);
   if (!biz) notFound();
   return (
-    <BizProvider biz={biz}>
+    <BizProvider biz={biz} dict={biz.lang === "sr" ? sr : null}>
       {biz.lang === "sr" && (
         <>
           <style>{translateGateCss}</style>

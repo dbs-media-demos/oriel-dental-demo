@@ -30,20 +30,21 @@ function GoogleG({ className }: { className?: string }) {
 
 export function ReviewCard({ r, className }: { r: Review; className?: string }) {
   return (
-    <figure className={clsx("flex flex-col rounded-3xl bg-shell p-7 ring-1 ring-line", className)}>
+    <figure className={clsx("flex flex-col rounded-3xl bg-shell p-7 ring-1 ring-line phone:rounded-2xl phone:p-4", className)}>
       <div className="flex items-center justify-between">
         <Stars n={r.rating} />
         <GoogleG className="size-5" />
       </div>
-      <blockquote className="mt-5 flex-1 text-[1rem] leading-relaxed text-ink">&ldquo;{r.text}&rdquo;</blockquote>
-      <figcaption className="mt-6 flex items-center gap-3 border-t border-line pt-5">
-        <span aria-hidden className="grid size-10 place-items-center rounded-full bg-mist-soft font-semibold text-sage">
+      <blockquote className="mt-5 flex-1 text-[1rem] leading-relaxed text-ink phone:mt-2 phone:text-[0.9rem] phone:leading-snug">&ldquo;{r.text}&rdquo;</blockquote>
+      <figcaption className="mt-6 flex items-center gap-3 border-t border-line pt-5 phone:mt-3 phone:pt-2.5">
+        <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-mist-soft font-semibold text-sage phone:size-8 phone:text-[0.85rem]">
           {r.name[0]}
         </span>
-        <span className="text-[0.9rem] leading-tight">
+        <span className="text-[0.9rem] leading-tight phone:text-[0.8rem]">
           <span className="block font-semibold">{r.name}</span>
           <span className="text-ink-soft">
-            {r.area} · {r.treatment} · {r.when}
+            {r.area && <>{r.area} · </>}
+            {r.treatment} · {r.when}
           </span>
         </span>
       </figcaption>
@@ -51,23 +52,23 @@ export function ReviewCard({ r, className }: { r: Review; className?: string }) 
   );
 }
 
-export function RatingSummary({ className, rating = site.rating }: { className?: string; rating?: { value: number; count: number } }) {
+export function RatingSummary({ className, rating = site.rating, value }: { className?: string; rating?: { value: number; count: number }; value?: string }) {
   return (
-    <div className={clsx("rounded-3xl bg-shell p-8 ring-1 ring-line", className)}>
-      <div className="flex items-center gap-3">
-        <GoogleG className="size-6" />
+    <div className={clsx("rounded-3xl bg-shell p-8 ring-1 ring-line phone:grid phone:grid-cols-[auto_1fr] phone:gap-x-5 phone:p-4", className)}>
+      <div className="flex items-center gap-3 phone:col-span-2 phone:gap-2 phone:text-[0.9rem]">
+        <GoogleG className="size-6 phone:size-5" />
         <span className="font-semibold">Google reviews</span>
       </div>
-      <div className="mt-6 flex items-end gap-4">
-        <span className="display text-[4.5rem] leading-none">{rating.value}</span>
-        <span className="pb-2">
+      <div className="mt-6 flex items-end gap-4 phone:mt-2 phone:flex-col phone:items-start phone:gap-1">
+        <span className="display text-[4.5rem] leading-none phone:text-[2.75rem]">{value ?? rating.value}</span>
+        <span className="pb-2 phone:pb-0">
           <Stars />
-          <span className="mt-1 block text-[0.9rem] text-ink-soft">{rating.count} reviews</span>
+          <span className="mt-1 block text-[0.9rem] text-ink-soft phone:mt-0 phone:text-[0.8rem]">{rating.count} reviews</span>
         </span>
       </div>
-      <dl className="mt-6 space-y-2">
+      <dl className="mt-6 space-y-2 phone:mt-2 phone:space-y-0">
         {ratingBreakdown.map((b) => (
-          <div key={b.stars} className="grid grid-cols-[1.5rem_1fr_2.5rem] items-center gap-3 text-[0.85rem]">
+          <div key={b.stars} className="grid grid-cols-[1.5rem_1fr_2.5rem] items-center gap-3 text-[0.85rem] phone:gap-2 phone:text-[0.72rem]">
             <dt className="text-ink-soft">{b.stars}★</dt>
             <dd className="h-1.5 overflow-hidden rounded-full bg-linen">
               <span className="block h-full rounded-full bg-sage" style={{ width: `${Math.max(1, b.share * 100)}%` }} />
@@ -80,19 +81,49 @@ export function RatingSummary({ className, rating = site.rating }: { className?:
   );
 }
 
+const listFor = (scrubFor?: Pick<Biz, "preview" | "shortName" | "lang">) => {
+  // Serbian previews: only neutral reviews about the visit, none that describe a result (Health Care Law art. 53)
+  const allowed = scrubFor?.lang === "sr" ? reviews.filter((r) => r.neutral) : reviews;
+  return scrubFor ? allowed.map((r) => ({ ...r, text: scrub(r.text, scrubFor), area: scrubFor.preview ? "" : r.area })) : allowed;
+};
+
 /** Two slow, opposite-moving rows of review cards. */
-export function ReviewMarquee({ scrubFor }: { scrubFor?: Pick<Biz, "preview" | "shortName"> } = {}) {
-  const list = scrubFor ? reviews.map((r) => ({ ...r, text: scrub(r.text, scrubFor), area: scrubFor.preview ? "" : r.area })) : reviews;
+export function ReviewMarquee({ scrubFor }: { scrubFor?: Pick<Biz, "preview" | "shortName" | "lang"> } = {}) {
+  const list = listFor(scrubFor);
   const half = Math.ceil(list.length / 2);
+  // A short list repeats, so the rows still run past the edge of the screen
+  const rows = [list.slice(0, half), list.slice(half)].map((row) => (list.length < 8 ? [...row, ...row, ...row] : row));
   return (
     <div className="space-y-6 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-      {[list.slice(0, half), list.slice(half)].map((row, i) => (
+      {rows.map((row, i) => (
         <Marquee key={i} reverse={i === 1} speed={90}>
-          {row.map((r) => (
-            <ReviewCard key={r.name} r={r} className="mr-6 w-[21rem] shrink-0 sm:w-[26rem]" />
+          {row.map((r, j) => (
+            <ReviewCard key={`${r.name}-${j}`} r={r} className="mr-6 w-[21rem] shrink-0 sm:w-[26rem]" />
           ))}
         </Marquee>
       ))}
+    </div>
+  );
+}
+
+/** Phones: nothing moves on its own. The first reviews in full, stacked; the rest in a row to swipe. */
+export function ReviewStack({ scrubFor }: { scrubFor?: Pick<Biz, "preview" | "shortName" | "lang"> } = {}) {
+  const list = listFor(scrubFor);
+  const stacked = list.length <= 5 ? list.length : 3;
+  return (
+    <div className="container-x">
+      <div className="grid gap-2.5">
+        {list.slice(0, stacked).map((r) => (
+          <ReviewCard key={r.name} r={r} />
+        ))}
+      </div>
+      {list.length > stacked && (
+        <div className="swipe swipe-wide mt-2.5">
+          {list.slice(stacked).map((r) => (
+            <ReviewCard key={r.name} r={r} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

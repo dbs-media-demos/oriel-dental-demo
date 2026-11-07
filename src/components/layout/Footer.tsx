@@ -8,28 +8,31 @@ import { DAY_NAMES, dayRange, telOf, weekFromMonday, type Biz } from "@/lib/biz-
 
 export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
   return (
-    <footer className="relative overflow-hidden bg-night pb-28 text-porcelain md:pb-10">
-      <div className="container-x pt-24 md:pt-32">
-        <div className="grid gap-16 lg:grid-cols-[1.3fr_1fr]">
+    <footer className="relative overflow-hidden bg-night pb-28 text-porcelain md:pb-10 phone:pb-[4.75rem]">
+      <div className="container-x pt-24 md:pt-32 phone:pt-8">
+        <div className="grid gap-16 lg:grid-cols-[1.3fr_1fr] phone:gap-6">
           <div>
             <p className="eyebrow text-mist">{biz.preview ? `${biz.name} · ${biz.area}` : "Oriel Dental Studio · Uptown Dallas"}</p>
-            <p className="display mt-6 max-w-[14ch] text-[clamp(2.6rem,6vw,5.6rem)]">
+            <p className="display mt-6 max-w-[14ch] text-[clamp(2.6rem,6vw,5.6rem)] phone:mt-2 phone:text-[1.8rem]">
               Dentistry, in a <em className="text-glow">better light.</em>
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href="/book" className="inline-flex min-h-12 items-center rounded-full bg-porcelain px-6 font-semibold text-ink transition-colors hover:bg-white">
+            {/* Phones have both in the bar at the bottom of the screen */}
+            <div className="mt-10 flex flex-wrap items-center gap-4 phone:hidden">
+              <Link href="/book" className="inline-flex min-h-12 items-center rounded-full bg-porcelain px-6 font-semibold whitespace-nowrap text-ink transition-colors hover:bg-white">
                 Book a visit
               </Link>
-              <a href={telOf(biz)} className="inline-flex min-h-12 items-center rounded-full border border-porcelain/30 px-6 font-semibold transition-colors hover:border-porcelain">
-                {biz.phoneDisplay}
-              </a>
+              {biz.phone && (
+                <a href={telOf(biz)} className="inline-flex min-h-12 items-center rounded-full border border-porcelain/30 px-6 font-semibold transition-colors hover:border-porcelain">
+                  {biz.phoneDisplay}
+                </a>
+              )}
             </div>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-2">
-            <div>
+          <div className="grid gap-10 sm:grid-cols-2 phone:grid-cols-2 phone:gap-5 phone:text-[0.9rem]">
+            <div className="min-w-0">
               <h2 className="eyebrow text-mist">Find us</h2>
-              <address className="mt-4 not-italic leading-relaxed text-porcelain/80">
+              <address className="mt-4 not-italic leading-relaxed text-porcelain/80 phone:mt-2 phone:leading-snug">
                 {biz.preview ? (
                   biz.address.full
                 ) : (
@@ -41,17 +44,17 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
                 )}
               </address>
               {!biz.preview && (
-                <a href={`mailto:${site.email}`} className="link-underline mt-3 inline-block text-porcelain/80 hover:text-porcelain">
+                <a href={`mailto:${site.email}`} className="link-underline mt-3 inline-block break-all text-porcelain/80 hover:text-porcelain phone:mt-1.5">
                   {site.email}
                 </a>
               )}
-              <div className="mt-5">
-                <OpenBadge tone="dark" />
+              <div className="mt-5 phone:mt-2">
+                <OpenBadge tone="dark" className="phone:rounded-2xl phone:px-2.5 phone:text-[0.7rem] phone:leading-tight" />
               </div>
             </div>
             <div>
               <h2 className="eyebrow text-mist">Hours</h2>
-              <dl className="mt-4 space-y-1.5 text-[0.95rem] text-porcelain/80">
+              <dl className="mt-4 space-y-1.5 text-[0.95rem] text-porcelain/80 phone:mt-2 phone:space-y-0.5 phone:text-[0.82rem]">
                 {weekFromMonday(biz.hours ?? []).map((h) => (
                   <div key={h.day} className="flex justify-between gap-4">
                     <dt>{DAY_NAMES[biz.lang][h.day].slice(0, 3)}</dt>
@@ -63,10 +66,10 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
           </div>
         </div>
 
-        <div className="mt-20 grid gap-10 border-t border-porcelain/15 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-20 grid gap-10 border-t border-porcelain/15 pt-12 sm:grid-cols-2 lg:grid-cols-4 phone:mt-5 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-4 phone:pt-5 phone:text-[0.84rem] phone:leading-snug">
           <nav aria-label="Treatments">
             <h2 className="eyebrow text-mist">Treatments</h2>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-2 phone:mt-2 phone:space-y-1">
               {services.slice(0, 5).map((s) => (
                 <li key={s.slug}>
                   <Link href={`/services/${s.slug}`} className="link-underline text-porcelain/75 hover:text-porcelain">
@@ -78,7 +81,7 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
           </nav>
           <nav aria-label="More treatments">
             <h2 className="eyebrow text-mist">&nbsp;</h2>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-2 phone:mt-2 phone:space-y-1">
               {services.slice(5).map((s) => (
                 <li key={s.slug}>
                   <Link href={`/services/${s.slug}`} className="link-underline text-porcelain/75 hover:text-porcelain">
@@ -91,8 +94,8 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
           {footerNav.map((group) => (
             <nav key={group.title} aria-label={group.title}>
               <h2 className="eyebrow text-mist">{group.title}</h2>
-              <ul className="mt-4 space-y-2">
-                {group.links.map((l) => (
+              <ul className="mt-4 space-y-2 phone:mt-2 phone:space-y-1">
+                {group.links.filter((l) => biz.lang !== "sr" || l.href !== "/smile-gallery").map((l) => (
                   <li key={l.href}>
                     <Link href={l.href} className="link-underline text-porcelain/75 hover:text-porcelain">
                       {l.label}
@@ -104,7 +107,7 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
           ))}
         </div>
 
-        <div className="mt-20 flex flex-col gap-6 border-t border-porcelain/15 pt-8 text-[0.85rem] text-porcelain/60 md:flex-row md:items-center md:justify-between">
+        <div className="mt-20 flex flex-col gap-6 border-t border-porcelain/15 pt-8 text-[0.85rem] text-porcelain/60 md:flex-row md:items-center md:justify-between phone:mt-5 phone:flex-col phone:items-start phone:gap-2 phone:pt-4 phone:text-[0.75rem]">
           <div className="flex items-center gap-3">
             <Mark className="h-7 w-auto text-porcelain" />
             <span>
@@ -126,7 +129,7 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
       </div>
 
       {/* Giant wordmark rising from the bottom edge */}
-      <svg aria-hidden viewBox="0 0 1000 260" className="pointer-events-none mt-10 block w-full select-none" preserveAspectRatio="xMidYMax meet">
+      <svg aria-hidden viewBox="0 0 1000 260" className="pointer-events-none mt-10 block w-full select-none phone:mt-1 phone:h-11" preserveAspectRatio="xMidYMax meet">
         <text x="500" y="250" textAnchor="middle" fontSize="330" fill="currentColor" opacity="0.06" style={{ fontFamily: "var(--font-display)", fontWeight: 300 }}>
           {biz.preview ? biz.shortName : "Oriel"}
         </text>

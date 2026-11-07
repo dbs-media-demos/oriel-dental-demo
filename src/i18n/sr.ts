@@ -26,13 +26,13 @@ export const sr: Record<string, string> = {
   // ── Hero ──
   "Dentist in light scrubs chatting with a smiling patient in a bright treatment room": "Stomatološkinja razgovara sa nasmejanom pacijentkinjom u svetloj ordinaciji",
   "Soft light. Unhurried hands.": "Meko svetlo. Ruke bez žurbe.",
-  "Honest prices.": "Poštene cene.",
+  "Honest prices.": "Cene unapred.",
   "Dentistry,": "Stomatologija",
   "in a": "u",
-  "better light.": "boljem svetlu.",
+  "better light.": "dnevnom svetlu.",
   "Dentistry, in a": "Stomatologija u",
   "A calm, daylight-filled studio for families, nervous patients and natural-looking cosmetic work. Same-day emergencies, evening hours, and every price before anything starts.":
-    "Mirna ordinacija puna dnevnog svetla, za porodice, nervozne pacijente i prirodnu estetsku stomatologiju. Hitni slučajevi istog dana, rad uveče i svaka cena pre nego što bilo šta počne.",
+    "Mirna ordinacija puna dnevnog svetla, za porodice, nervozne pacijente i estetsku stomatologiju. Hitni slučajevi istog dana, rad uveče i svaka cena pre nego što bilo šta počne.",
   "Book your first visit": "Zakažite prvi pregled",
 
   // ── Marquee ──
@@ -70,13 +70,14 @@ export const sr: Record<string, string> = {
   "$1,450–$2,100 per tooth": "45.000–65.000 din po zubu",
   "Clear aligners": "Providne folije (aligneri)",
   "6–18 months": "6–18 meseci",
+  "$3,800–$6,200": "180.000–350.000 din",
   "Dental implants": "Implanti",
   "3–6 months start to finish": "3–6 meseci od početka do kraja",
   "$3,900–$5,200 per tooth, crown included": "90.000–130.000 din po zubu, sa krunicom",
   "Emergency dentistry": "Hitna stomatologija",
   "Same day": "Istog dana",
   "$125 emergency exam + x-ray": "Hitan pregled + snimak 3.500 din",
-  "Sedation & anxiety-free dentistry": "Sedacija i stomatologija bez straha",
+  "Sedation & anxiety-free dentistry": "Sedacija i rad sa pacijentima koji se plaše",
   "Any appointment": "Uz svaki termin",
   "Nitrous $75": "Azot-oksidul 3.000 din",
   "Kids' dentistry": "Dečja stomatologija",
@@ -86,7 +87,7 @@ export const sr: Record<string, string> = {
   // ── Your first visit ──
   "Your first visit": "Vaša prva poseta",
   "Five calm steps,": "Pet mirnih koraka,",
-  "zero surprises.": "bez iznenađenja.",
+  "zero surprises.": "jasno od početka.",
   "From booking to the gift bag, here is exactly what your first visit feels like. About 90 minutes, and nothing happens without your say-so.":
     "Od zakazivanja do poklon-kesice, evo kako tačno izgleda vaša prva poseta. Oko 90 minuta, i ništa se ne radi bez vašeg odobrenja.",
   "Chunky knit blanket draped over a soft sofa": "Pleteno ćebe prebačeno preko mekane sofe",
@@ -112,7 +113,7 @@ export const sr: Record<string, string> = {
   "No goopy impressions. A three-minute 3D scan and low-dose digital x-rays show us everything, and we show it all to you on the screen above the chair.":
     "Bez otisne mase. Trominutni 3D sken i digitalni snimci sa malo zračenja pokažu nam sve, a mi sve to pokažemo vama na ekranu iznad stolice.",
   "3D intraoral scan": "3D intraoralni sken",
-  "80% less radiation": "80% manje zračenja",
+  "80% less radiation": "Digitalni snimci",
   "See what we see": "Vidite što i mi",
   Plan: "Plan",
   "A clear plan, with prices.": "Jasan plan, sa cenama.",
@@ -180,7 +181,7 @@ export const sr: Record<string, string> = {
   // ── Comfort menu ──
   "The comfort menu": "Meni udobnosti",
   "Built for people who": "Za ljude koji",
-  "hate the dentist.": "mrze zubare.",
+  "hate the dentist.": "se plaše zubara.",
   "Pick your comforts when you book. We note them in your chart, so they're waiting for you every single time.":
     "Izaberite šta vam prija kad zakazujete. Zapišemo to u karton, pa vas čeka svaki put.",
   "Breathe in for four.": "Udahnite na četiri.",
@@ -196,13 +197,13 @@ export const sr: Record<string, string> = {
   "Raise your hand and we pause. Every time, no questions, no sighs.": "Podignite ruku i stajemo. Svaki put, bez pitanja i bez uzdisanja.",
   "Nitrous & oral sedation": "Azot-oksidul i oralna sedacija",
   "For the truly nervous: gentle sedation with careful monitoring.": "Za one koji se zaista plaše: blaga sedacija uz pažljivo praćenje.",
-  "Read about sedation & anxiety-free dentistry →": "Više o sedaciji i stomatologiji bez straha →",
+  "Read about sedation & anxiety-free dentistry →": "Više o sedaciji →",
 
   // ── The studio ──
   "A walk through the studio": "Šetnja kroz ordinaciju",
   "Every chair": "Svaka stolica",
   "faces a window.": "gleda u prozor.",
-  "A studio designed with an architect, not a dental catalog.": "Ordinacija koju je osmislio arhitekta, a ne katalog stomatološke opreme.",
+  "A studio designed with an architect, not a dental catalog.": "Ordinacija koju je osmislio arhitekta.",
   "Take the full tour →": "Pogledajte celu ordinaciju →",
   "Welcoming lobby with oak panels, pendant lights and plants": "Topao ulaz sa hrastovim panelima, visećim lampama i biljkama",
   "The front door: oak, plants and a real person to greet you.": "Ulaz: hrast, biljke i pravi čovek koji vas dočekuje.",
@@ -260,7 +261,7 @@ export const sr: Record<string, string> = {
   "Emily H.": "Tamara H.",
   "3 months ago": "pre 3 meseca",
   "Great care and the nicest waiting room in town. Parking in the garage took a minute to figure out the first time, but they validate it and the front desk walked me through it.":
-    "Odlična nega i najlepša čekaonica u gradu. Prvi put mi je trebalo malo da nađem parking, ali na recepciji su mi sve objasnili.",
+    "Ljubazno osoblje i prijatna čekaonica. Prvi put mi je trebalo malo da nađem parking, ali na recepciji su mi sve objasnili.",
   "David N.": "Dušan N.",
   Crown: "Krunica",
   "The $99 first visit was genuinely thorough: 3D scan, x-rays, cleaning and a long talk with the dentist. I got a written plan with prices and zero pressure to do anything that day.":
@@ -280,7 +281,7 @@ export const sr: Record<string, string> = {
     "Oko 90 minuta: opušten razgovor, kompletan pregled, 3D sken zuba, digitalni snimci sa malo zračenja i nežno čišćenje ako stignemo. Odlazite sa pisanim planom i cenama. Ništa ne radimo bez vašeg odobrenja.",
   "I'm really nervous about the dentist. Can you help?": "Baš se plašim zubara. Možete li da pomognete?",
   "It's what we do best. Start with a no-chair meet & greet over coffee, pick from our comfort menu (weighted blanket, headphones, shows on the ceiling) and agree a stop signal. Nitrous oxide and oral sedation are available if you'd like them.":
-    "To nam najbolje ide. Počnite upoznavanjem uz kafu, bez stolice, izaberite iz menija udobnosti (otežano ćebe, slušalice, serija na plafonu) i dogovorimo znak za pauzu. Ako želite, tu su i azot-oksidul i oralna sedacija.",
+    "Tu smo da pomognemo. Počnite upoznavanjem uz kafu, bez stolice, izaberite iz menija udobnosti (otežano ćebe, slušalice, serija na plafonu) i dogovorimo znak za pauzu. Ako želite, tu su i azot-oksidul i oralna sedacija.",
   "Do you take my insurance?": "Da li radite preko osiguranja?",
   "We're in network with most major PPO plans, including Delta Dental, Cigna, MetLife, Aetna, Guardian and United Concordia, and we file claims for out-of-network plans too. Use the insurance checker or call us to confirm.":
     "Sarađujemo sa većinom privatnih zdravstvenih osiguranja i pomažemo oko dokumentacije za refundaciju. Pozovite nas da proverimo vašu polisu.",
@@ -294,7 +295,7 @@ export const sr: Record<string, string> = {
 
   // ── Closing CTA ──
   "New patients welcome": "Novi pacijenti su dobrodošli",
-  "Your calmest dental visit starts here.": "Vaš najmirniji odlazak kod zubara počinje ovde.",
+  "Your calmest dental visit starts here.": "Vaš miran odlazak kod zubara počinje ovde.",
   "The $99 first visit": "Prvi pregled 4.900 din",
   "Exam, full 3D scan, digital x-rays and a gentle cleaning for new patients without insurance.": "Pregled, kompletan 3D sken, digitalni snimci i nežno čišćenje za nove pacijente.",
   "Book online": "Zakažite online",

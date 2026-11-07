@@ -11,7 +11,7 @@ export function PreviewMap({ biz }: { biz: Biz }) {
   const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
   return (
     <section aria-labelledby="visit-title" className="py-24 md:py-36">
-      <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
+      <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.3fr] lg:gap-20 phone:gap-5">
         <div>
           <SectionIntro
             id="visit-title"
@@ -19,9 +19,9 @@ export function PreviewMap({ biz }: { biz: Biz }) {
             title={biz.lang === "sr" ? <>Lako <em>do nas.</em></> : <>In the heart <em>of {biz.area}.</em></>}
             size="h-md"
           />
-          <Reveal className="mt-8 space-y-6">
+          <Reveal className="mt-8 space-y-6 phone:mt-3 phone:space-y-3">
             <OpenBadge />
-            {biz.address.full && <address className="text-lg not-italic">{biz.address.full}</address>}
+            {biz.address.full && <address className="text-lg not-italic phone:text-base">{biz.address.full}</address>}
             {biz.hours && (
               <dl className="grid max-w-sm grid-cols-[auto_1fr] gap-x-8 gap-y-1.5 text-[0.95rem]">
                 {weekFromMonday(biz.hours).map((h) => (
@@ -38,8 +38,10 @@ export function PreviewMap({ biz }: { biz: Biz }) {
           </Reveal>
         </div>
         <Reveal>
-          <div className="arch relative aspect-[4/5] w-full overflow-hidden bg-shell ring-1 ring-line md:aspect-[5/4]">
-            <iframe src={embed} title={L(biz, `Map: ${query}`, `Mapa: ${query}`)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="absolute inset-0 size-full border-0" />
+          <div className="arch relative aspect-[4/5] w-full overflow-hidden bg-shell ring-1 ring-line md:aspect-[5/4] phone:aspect-[7/5] phone:rounded-3xl">
+            {/* Phones: a swipe over the map scrolls the page, a tap opens directions */}
+            <iframe src={embed} title={L(biz, `Map: ${query}`, `Mapa: ${query}`)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="absolute inset-0 size-full border-0 phone:pointer-events-none" />
+            <a href={directions} aria-label={L(biz, "Get directions", "Kako do nas")} className="absolute inset-0 hidden phone:block" />
           </div>
         </Reveal>
       </div>

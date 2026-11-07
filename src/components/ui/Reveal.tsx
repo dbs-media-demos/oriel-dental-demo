@@ -2,11 +2,11 @@
 
 import { useRef, type CSSProperties, type ElementType, type ReactNode } from "react";
 import clsx from "clsx";
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion, loadSplitText } from "@/lib/gsap";
+import { useDesktopGSAP, prefersReducedMotion } from "@/lib/motion";
 import type { SplitText } from "gsap/SplitText";
 
 /*
- * Scroll-driven reveals.
+ * Scroll-driven reveals, on desktop only (phones get PhoneRise, one per section).
  *
  * Content is always visible in the HTML, so crawlers, screen readers and no-JS
  * visitors see it. `immediate` variants (top of the page) use pure CSS so they
@@ -31,8 +31,8 @@ type SplitProps = {
 export function SplitReveal({ children, as: Tag = "h2", className, delay = 0, immediate, stagger = 0.12, id }: SplitProps) {
   const ref = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap, loadSplitText }) => {
       const el = ref.current;
       if (!el || immediate || prefersReducedMotion() || !belowFold(el)) return;
       gsap.set(el, { opacity: 0 });
@@ -89,8 +89,8 @@ type RevealProps = {
 export function Reveal({ children, as: Tag = "div", className, delay = 0, y = 36, stagger, immediate, id }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap, ScrollTrigger }) => {
       const el = ref.current;
       if (!el || immediate || prefersReducedMotion() || !belowFold(el)) return;
       const targets = stagger ? Array.from(el.children) : [el];
@@ -117,8 +117,8 @@ export function Reveal({ children, as: Tag = "div", className, delay = 0, y = 36
 export function ScrubWords({ text, className, as: Tag = "p" }: { text: string; className?: string; as?: ElementType }) {
   const ref = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap }) => {
       const el = ref.current;
       if (!el || prefersReducedMotion()) return;
       const words = el.querySelectorAll<HTMLElement>("[data-w]");
@@ -159,8 +159,8 @@ export function Parallax({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap }) => {
       const el = ref.current;
       const inner = el?.firstElementChild as HTMLElement | null;
       if (!el || !inner || prefersReducedMotion()) return;

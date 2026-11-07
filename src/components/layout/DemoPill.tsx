@@ -13,7 +13,7 @@ const read = () => {
   }
 };
 
-/** "Concept site by Scale by Noon": small, fixed and dismissible. Shorter label on phones. */
+/** "Concept site by Scale by Noon": small, fixed and dismissible on desktop; part of the page on phones, with a shorter label. */
 export function DemoPill() {
   const biz = useBiz();
   const stored = useSyncExternalStore(
@@ -25,10 +25,10 @@ export function DemoPill() {
   if (stored || dismissed) return null;
 
   return (
-    <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-3 z-40 flex items-center rounded-full bg-night/90 py-1 pr-1 pl-3.5 text-[0.75rem] text-porcelain shadow-lg ring-1 ring-porcelain/10 backdrop-blur md:right-5 md:bottom-5 md:left-auto">
+    <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-3 z-40 flex items-center rounded-full bg-night/90 py-1 pr-1 pl-3.5 text-[0.75rem] text-porcelain shadow-lg ring-1 ring-porcelain/10 backdrop-blur md:right-5 md:bottom-5 md:left-auto phone:static phone:mx-auto phone:my-4 phone:w-fit phone:max-w-[calc(100%-2rem)] phone:pr-3.5 phone:shadow-none phone:backdrop-blur-none">
       <a href={site.agencyUrl} className="py-1.5 font-medium whitespace-nowrap hover:underline">
         {biz.preview ? (
-          <span className="block max-w-[15rem] truncate md:max-w-none">
+          <span className="block max-w-[15rem] truncate md:max-w-none phone:max-w-full">
             {biz.lang === "sr" ? `Pregled za ${biz.shortName} · Scale by Noon ↗` : `Preview for ${biz.shortName} · by Scale by Noon ↗`}
           </span>
         ) : (
@@ -47,7 +47,7 @@ export function DemoPill() {
             sessionStorage.setItem(KEY, "1");
           } catch {}
         }}
-        className="ml-1 grid size-8 place-items-center rounded-full text-base leading-none text-porcelain/70 hover:bg-porcelain/10 hover:text-porcelain"
+        className="ml-1 grid size-8 place-items-center rounded-full text-base leading-none text-porcelain/70 hover:bg-porcelain/10 hover:text-porcelain phone:hidden"
       >
         ×
       </button>

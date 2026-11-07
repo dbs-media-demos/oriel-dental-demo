@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, type ReactNode } from "react";
 import clsx from "clsx";
-import { gsap, useGSAP, isTouch, prefersReducedMotion } from "@/lib/gsap";
+import { useDesktopGSAP, isTouch, prefersReducedMotion } from "@/lib/motion";
 
 type Variant = "primary" | "ghost" | "light" | "outline-light";
 
@@ -29,8 +29,8 @@ type Props = {
 export function Button({ href, children, variant = "primary", className, icon, magnetic = true, ariaLabel, transitionTypes }: Props) {
   const ref = useRef<HTMLAnchorElement>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap }) => {
       const el = ref.current;
       if (!el || !magnetic || isTouch() || prefersReducedMotion()) return;
       const inner = el.querySelector<HTMLElement>("[data-inner]");

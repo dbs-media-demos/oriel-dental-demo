@@ -2,10 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
+import { isStill } from "@/lib/motion";
 
 /**
- * Muted background loop. Only plays when it's on screen, and never for reduced-motion
- * or Save-Data visitors (they keep the poster).
+ * Muted background loop. Only plays when it's on screen, and never on phones or for
+ * reduced-motion or Save-Data visitors (they keep the poster).
  */
 export function AmbientVideo({ src, poster, className }: { src: string; poster: string; className?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -14,7 +15,7 @@ export function AmbientVideo({ src, poster, className }: { src: string; poster: 
     const v = ref.current;
     if (!v) return;
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches || conn?.saveData;
+    const still = isStill() || window.matchMedia("(prefers-reduced-motion: reduce)").matches || conn?.saveData;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return v.pause();

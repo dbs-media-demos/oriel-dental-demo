@@ -42,6 +42,9 @@ export const initialsOf = (name: string) => {
   return name.includes("&") ? words.join("&") : words.join("");
 };
 
+/** The town for headlines: "Uptown Dallas" on the concept site, the business's city on a preview. */
+export const townOf = (biz: Pick<Biz, "preview" | "area" | "address">) => (biz.preview ? biz.address.city || biz.area : `${biz.area} ${biz.address.city}`);
+
 export const openDays = (biz: Pick<Biz, "hours">) => biz.hours?.filter((h) => h.open).length ?? 0;
 
 /** Pick the English or Serbian version of a line written in code (names, numbers inside). */

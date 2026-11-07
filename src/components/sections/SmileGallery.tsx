@@ -37,7 +37,7 @@ export function SmileGallery({ cases, tabs, limit, featured = false }: { cases: 
       </div>
 
       <ViewTransition key={tab} name="smile-grid" share="auto" enter="auto" default="none">
-        <ul className={clsx("mt-10 grid gap-x-6 gap-y-14", featured ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3")}>
+        <ul className={clsx("swipe mt-10 grid gap-x-6 gap-y-14 phone:mt-4", featured ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3")}>
           {list.map((c, i) => (
             <li key={c.id} className={clsx(featured && i === 0 && "md:col-span-2")}>
               <BeforeAfter
@@ -45,24 +45,24 @@ export function SmileGallery({ cases, tabs, limit, featured = false }: { cases: 
                 after={c.after}
                 label={c.title}
                 hint={i === 0}
-                className={clsx("rounded-t-[999px] rounded-b-3xl", featured && i === 0 ? "aspect-[4/3] md:aspect-[16/9] md:rounded-t-[40vw]" : featured ? "aspect-[4/5] md:aspect-[5/4]" : "aspect-[4/5]")}
-                sizes={featured && i === 0 ? "100vw" : "(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"}
+                className={clsx("rounded-t-[999px] rounded-b-3xl", featured && i === 0 ? "aspect-[4/3] md:aspect-[16/9] md:rounded-t-[40vw]" : featured ? "aspect-[4/5] md:aspect-[5/4]" : "aspect-[4/5]", "phone:aspect-square phone:rounded-t-[999px]")}
+                sizes={featured && i === 0 ? "(max-width: 767px) 62vw, 100vw" : "(max-width: 767px) 62vw, (min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"}
               />
-              <div className="mt-5 flex items-start justify-between gap-4">
+              <div className="mt-5 flex items-start justify-between gap-4 phone:mt-2.5 phone:flex-col phone:gap-1.5">
                 <div>
-                  <h3 className="display text-[1.6rem]">{c.title}</h3>
-                  <p className="mt-1 text-[0.95rem] text-ink-soft">{c.detail}</p>
+                  <h3 className="display text-[1.6rem] phone:text-[1.2rem]">{c.title}</h3>
+                  <p className="mt-1 text-[0.95rem] text-ink-soft phone:text-[0.85rem] phone:leading-snug">{c.detail}</p>
                 </div>
-                <div className="shrink-0 text-right">
+                <div className="shrink-0 text-right phone:flex phone:items-center phone:gap-2 phone:text-left">
                   <span className="block text-[0.85rem] font-semibold">{c.visits}</span>
-                  <span className="mt-1 inline-block rounded-full bg-sand-soft px-2.5 py-0.5 text-[0.72rem] font-semibold tracking-wide text-ink uppercase">Illustrative</span>
+                  <span className="mt-1 inline-block rounded-full bg-sand-soft phone:mt-0 px-2.5 py-0.5 text-[0.72rem] font-semibold tracking-wide text-ink uppercase">Illustrative</span>
                 </div>
               </div>
             </li>
           ))}
         </ul>
       </ViewTransition>
-      <p className="mt-10 max-w-2xl text-[0.85rem] text-ink-soft">
+      <p className="mt-10 max-w-2xl text-[0.85rem] text-ink-soft phone:mt-4 phone:text-[0.78rem] phone:leading-snug">
         Illustrative simulations on stock photography, shown to explain each treatment. They are not patient results. Results vary from person to person; we&apos;re
         happy to show real case photos (with permission) at your consultation.
       </p>

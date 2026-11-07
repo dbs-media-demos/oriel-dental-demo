@@ -8,11 +8,14 @@ import { Logo } from "@/components/brand/Logo";
 import { Button, PhoneIcon } from "@/components/ui/Button";
 import { OpenBadge } from "@/components/ui/OpenBadge";
 import { mainNav } from "@/content/site";
-import { useBiz } from "@/components/preview/BizContext";
+import { useBiz, useT } from "@/components/preview/BizContext";
 import { telOf } from "@/lib/biz-core";
 
 export function Header() {
   const biz = useBiz();
+  const t = useT();
+  // Serbian previews have no smile gallery (Health Care Law art. 53)
+  const nav = biz.lang === "sr" ? mainNav.filter((item) => item.href !== "/smile-gallery") : mainNav;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -68,18 +71,18 @@ export function Header() {
       className={clsx(
         "fixed inset-x-0 top-0 z-50 transition-[transform,background-color,box-shadow] duration-700 ease-[var(--ease-soft)]",
         hidden && !open ? "-translate-y-full" : "translate-y-0",
-        scrolled && !open ? "bg-porcelain/85 shadow-[0_1px_0_var(--color-line)] backdrop-blur-xl" : "bg-transparent",
+        scrolled && !open ? "bg-porcelain/85 shadow-[0_1px_0_var(--color-line)] backdrop-blur-xl phone:bg-porcelain phone:backdrop-blur-none" : "bg-transparent",
       )}
     >
-      <div className="container-x flex h-[var(--header-h)] items-center justify-between gap-6">
-        <Link href="/" className="relative z-10 text-ink">
+      <div className="container-x flex h-[var(--header-h)] items-center justify-between gap-6 phone:gap-3">
+        <Link href="/" className="relative z-10 min-w-0 text-ink">
           <Logo />
-          <span className="sr-only">, home</span>
+          <span className="sr-only">{t(", home")}</span>
         </Link>
 
-        <nav aria-label="Main" className="hidden xl:block">
+        <nav aria-label={t("Main")} className="hidden xl:block">
           <ul className="flex items-center gap-1">
-            {mainNav.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -89,20 +92,20 @@ export function Header() {
                     isActive(item.href) ? "bg-mist-soft text-ink" : "text-ink/75 hover:text-ink",
                   )}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div className="relative z-10 flex items-center gap-2 sm:gap-3">
+        <div className="relative z-10 flex shrink-0 items-center gap-2 sm:gap-3">
           <a href={telOf(biz)} className="hidden items-center gap-2 px-2 text-[0.92rem] font-semibold text-ink lg:inline-flex">
             <PhoneIcon />
             {biz.phoneDisplay}
           </a>
-          <Button href="/book" className="hidden !min-h-11 !px-5 sm:inline-flex">
-            Book a visit
+          <Button href="/book" className="!min-h-11 !px-5 whitespace-nowrap phone:hidden">
+            {t("Book a visit")}
           </Button>
           <button
             ref={toggleRef}
@@ -113,8 +116,8 @@ export function Header() {
             }}
             aria-expanded={open}
             aria-controls="site-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="grid size-12 place-items-center rounded-full bg-shell/80 ring-1 ring-line backdrop-blur xl:hidden"
+            aria-label={t(open ? "Close menu" : "Open menu")}
+            className="grid size-12 place-items-center rounded-full bg-shell/80 ring-1 ring-line backdrop-blur xl:hidden phone:size-11 phone:backdrop-blur-none"
           >
             <span className="relative block h-3 w-5">
               <span className={clsx("absolute left-0 h-[1.5px] w-5 bg-ink transition-all duration-500", open ? "top-1.5 rotate-45" : "top-0")} />
@@ -132,12 +135,12 @@ export function Header() {
         hidden={!open}
         className="fixed inset-0 z-40 flex flex-col bg-porcelain pt-[calc(var(--header-h)+1rem)] xl:hidden"
       >
-        <nav aria-label="Mobile" className="container-x flex-1 overflow-y-auto">
+        <nav aria-label={t("Mobile")} className="container-x flex-1 overflow-y-auto">
           <ul className="border-t border-line">
-            {[{ label: "Home", href: "/" }, ...mainNav, { label: "Reviews", href: "/reviews" }, { label: "Contact", href: "/contact" }].map((item, i) => (
+            {[{ label: "Home", href: "/" }, ...nav, { label: "Reviews", href: "/reviews" }, { label: "Contact", href: "/contact" }].map((item, i) => (
               <li key={item.href} className="border-b border-line" style={{ animation: `fade-in 1s var(--ease-soft) ${0.05 * i}s both` }}>
                 <Link href={item.href} className="display flex items-center justify-between py-4 text-[2rem]">
-                  {item.label}
+                  {t(item.label)}
                   <span aria-hidden className="text-base text-sage">
                     0{i + 1}
                   </span>

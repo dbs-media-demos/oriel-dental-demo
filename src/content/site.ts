@@ -45,6 +45,9 @@ export const site = {
   agencyUrl: "https://www.scalebynoon.com",
 } as const;
 
+export const heroLede =
+  "A calm, daylight-filled studio for families, nervous patients and natural-looking cosmetic work. Same-day emergencies, evening hours, and every price before anything starts.";
+
 export const fullAddress = `${site.address.street}, ${site.address.city}, ${site.address.region} ${site.address.postal}`;
 
 /** Weekly schedule in practice-local time (America/Chicago). 0 = Sunday. Times are minutes after midnight. */

@@ -31,11 +31,11 @@ export function InsuranceChecker({ compact = false }: { compact?: boolean }) {
   const result = picked && picked !== "none" ? statusCopy[picked.status] : null;
 
   return (
-    <div className={clsx("rounded-[2rem] bg-shell p-6 ring-1 ring-line sm:p-10", compact && "sm:p-8")}>
+    <div className={clsx("rounded-[2rem] bg-shell p-6 ring-1 ring-line sm:p-10 phone:rounded-3xl phone:p-4", compact && "sm:p-8 phone:p-4")}>
       <label htmlFor={`${id}-input`} className="eyebrow text-sage">
         Check your insurance
       </label>
-      <div className="relative mt-4">
+      <div className="relative mt-4 phone:mt-2.5">
         <svg viewBox="0 0 20 20" className="pointer-events-none absolute top-1/2 left-5 size-5 -translate-y-1/2 text-ink-soft" aria-hidden fill="none">
           <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.6" />
           <path d="m13.5 13.5 4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -72,7 +72,7 @@ export function InsuranceChecker({ compact = false }: { compact?: boolean }) {
               choose(matches[hi]);
             } else if (e.key === "Escape") setOpen(false);
           }}
-          className="h-16 w-full rounded-full bg-porcelain pr-6 pl-14 text-[1.05rem] ring-1 ring-line transition-shadow outline-none placeholder:text-ink-soft/80 focus:ring-2 focus:ring-sage"
+          className="h-16 w-full rounded-full bg-porcelain pr-6 pl-14 text-[1.05rem] text-ellipsis ring-1 ring-line transition-shadow outline-none placeholder:text-ink-soft/80 focus:ring-2 focus:ring-sage phone:h-13 phone:pr-4 phone:pl-12 phone:text-base"
         />
         <ul
           id={`${id}-list`}
@@ -92,15 +92,15 @@ export function InsuranceChecker({ compact = false }: { compact?: boolean }) {
                 choose(m);
               }}
               onMouseEnter={() => setHi(i)}
-              className={clsx("flex cursor-pointer items-center justify-between rounded-2xl px-4 py-3", i === hi && "bg-mist-soft")}
+              className={clsx("flex cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 py-3", i === hi && "bg-mist-soft")}
             >
               <span>{m.name}</span>
-              <span className={clsx("text-[0.75rem] font-semibold", m.status === "in-network" ? "text-sage" : "text-ink-soft")}>{statusCopy[m.status].label}</span>
+              <span className={clsx("shrink-0 text-[0.75rem] font-semibold", m.status === "in-network" ? "text-sage" : "text-ink-soft")}>{statusCopy[m.status].label}</span>
             </li>
           ))}
         </ul>
       </div>
-      <button type="button" onClick={() => { setPicked("none"); setQuery(""); }} className="mt-4 text-[0.92rem] font-semibold text-sage underline-offset-4 hover:underline">
+      <button type="button" onClick={() => { setPicked("none"); setQuery(""); }} className="mt-4 text-[0.92rem] font-semibold text-sage underline-offset-4 hover:underline phone:mt-2.5 phone:min-h-10">
         I don&apos;t have dental insurance
       </button>
 

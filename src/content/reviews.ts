@@ -7,6 +7,8 @@ export type Review = {
   date: string;
   treatment: string;
   text: string;
+  /** About the visit, not the result: these are the ones a Serbian preview may show. */
+  neutral?: boolean;
 };
 
 export const reviews: Review[] = [
@@ -17,6 +19,7 @@ export const reviews: Review[] = [
     when: "2 weeks ago",
     date: "2026-09-14",
     treatment: "Cleaning",
+    neutral: true,
     text: "I hadn't been to a dentist in six years because of one awful experience. Maya let me hold a stress ball, explained every step, and stopped every time I lifted my hand. I actually booked my next cleaning before I left.",
   },
   {
@@ -44,6 +47,7 @@ export const reviews: Review[] = [
     when: "2 months ago",
     date: "2026-07-30",
     treatment: "Kids' dentistry",
+    neutral: true,
     text: "Dr. Delgado spoke Spanish with my mom and English with our kids, all in the same appointment. Our four-year-old now asks when she can go back and pick from the treasure drawer.",
   },
   {
@@ -89,6 +93,7 @@ export const reviews: Review[] = [
     when: "2 months ago",
     date: "2026-07-15",
     treatment: "Crown",
+    neutral: true,
     text: "Great care and the nicest waiting room in Dallas. Parking in the garage took a minute to figure out the first time, but they validate it and the front desk walked me through it.",
   },
   {
@@ -98,6 +103,7 @@ export const reviews: Review[] = [
     when: "4 weeks ago",
     date: "2026-08-31",
     treatment: "New patient visit",
+    neutral: true,
     text: "The $99 first visit was genuinely thorough: 3D scan, x-rays, cleaning and a long talk with Dr. Marsh. I got a written plan with prices and zero pressure to do anything that day.",
   },
 ];

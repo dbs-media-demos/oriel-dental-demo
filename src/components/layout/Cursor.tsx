@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { gsap, isTouch, prefersReducedMotion } from "@/lib/gsap";
+import { isStill, loadKit, prefersReducedMotion } from "@/lib/motion";
 
 /**
  * A soft follower ring for mouse users. Elements with `data-cursor="Drag"` (or any label)
@@ -13,7 +13,7 @@ export function Cursor() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (isTouch() || prefersReducedMotion()) return;
+    if (isStill() || prefersReducedMotion()) return;
     const id = window.requestAnimationFrame(() => setEnabled(true));
     return () => window.cancelAnimationFrame(id);
   }, []);
@@ -21,12 +21,16 @@ export function Cursor() {
   useEffect(() => {
     const el = ring.current;
     if (!enabled || !el) return;
-    const xTo = gsap.quickTo(el, "x", { duration: 0.7, ease: "power3.out" });
-    const yTo = gsap.quickTo(el, "y", { duration: 0.7, ease: "power3.out" });
+    let xTo: ((v: number) => void) | undefined;
+    let yTo: ((v: number) => void) | undefined;
+    void loadKit().then(({ gsap }) => {
+      xTo = gsap.quickTo(el, "x", { duration: 0.7, ease: "power3.out" });
+      yTo = gsap.quickTo(el, "y", { duration: 0.7, ease: "power3.out" });
+    });
     let current = "";
     const move = (e: PointerEvent) => {
-      xTo(e.clientX);
-      yTo(e.clientY);
+      xTo?.(e.clientX);
+      yTo?.(e.clientY);
       const target = (e.target as Element | null)?.closest?.("[data-cursor]");
       const next = target?.getAttribute("data-cursor") ?? "";
       const interactive = !next && (e.target as Element | null)?.closest?.("a, button, [role='slider'], input, select, textarea");

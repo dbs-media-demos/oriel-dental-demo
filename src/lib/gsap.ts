@@ -2,19 +2,13 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 
+// Only ever loaded through loadKit() in ./motion, on desktop.
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
+  gsap.registerPlugin(ScrollTrigger);
   // Oriel moves slowly on purpose: long, soft easing everywhere.
   gsap.defaults({ ease: "expo.out", duration: 1.4 });
 }
-
-export const prefersReducedMotion = () =>
-  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-export const isTouch = () =>
-  typeof window !== "undefined" && window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
 /** SplitText is only needed below the fold, so it's fetched on first use. */
 export const loadSplitText = () =>
@@ -23,4 +17,4 @@ export const loadSplitText = () =>
     return SplitText;
   });
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, ScrollTrigger };

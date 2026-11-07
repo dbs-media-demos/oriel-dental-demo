@@ -35,7 +35,7 @@ export function OpenBadge({ className, tone = "light" }: { className?: string; t
         className,
       )}
     >
-      <span className="relative flex size-2">
+      <span className="relative flex size-2 shrink-0">
         {open && <span className="absolute inset-0 rounded-full bg-emerald-600 motion-safe:animate-[pulse-ring_2.4s_ease-out_infinite]" />}
         <span className={clsx("relative size-2 rounded-full", open ? "bg-emerald-600" : snap ? "bg-sand" : "bg-mist")} />
       </span>

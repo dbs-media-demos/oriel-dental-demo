@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import clsx from "clsx";
-import { gsap, useGSAP, isTouch, prefersReducedMotion } from "@/lib/gsap";
+import { useDesktopGSAP, isTouch, prefersReducedMotion } from "@/lib/motion";
 import type { Img } from "@/content/images";
 
 export type IndexItem = { slug: string; name: string; duration: string; price: string; tagline: string; image: Img };
@@ -18,8 +18,8 @@ export function TreatmentIndex({ items }: { items: IndexItem[] }) {
   const float = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap }) => {
       const el = root.current;
       const f = float.current;
       if (!el || !f || isTouch() || prefersReducedMotion()) return;
@@ -50,26 +50,26 @@ export function TreatmentIndex({ items }: { items: IndexItem[] }) {
               transitionTypes={["nav-forward"]}
               onPointerEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
-              className="group grid grid-cols-[4.5rem_1fr] items-center gap-4 py-5 md:grid-cols-[3rem_1fr_auto] md:gap-8 md:py-7"
+              className="group grid grid-cols-[4.5rem_1fr] items-center gap-4 py-5 md:grid-cols-[3rem_1fr_auto] md:gap-8 md:py-7 phone:grid-cols-[2.75rem_1fr] phone:gap-3 phone:py-1.5"
             >
-              <span className="relative aspect-square overflow-hidden rounded-t-full rounded-b-lg md:hidden">
+              <span className="relative aspect-square overflow-hidden rounded-t-full rounded-b-lg md:hidden phone:block">
                 <Image src={s.image.src} alt="" fill sizes="72px" className="object-cover" placeholder="blur" blurDataURL={s.image.blur} />
               </span>
-              <span className="hidden text-sm text-ink-soft tabular-nums md:block">{String(i + 1).padStart(2, "0")}</span>
+              <span className="hidden text-sm text-ink-soft tabular-nums md:block phone:hidden">{String(i + 1).padStart(2, "0")}</span>
               <span className="min-w-0">
                 <span
                   className={clsx(
-                    "display block text-[clamp(1.7rem,4vw,3.6rem)] transition-[transform,color] duration-700 ease-[var(--ease-soft)] md:group-hover:translate-x-4",
+                    "display block text-[clamp(1.7rem,4vw,3.6rem)] transition-[transform,color] duration-700 ease-[var(--ease-soft)] md:group-hover:translate-x-4 phone:text-[1.2rem]",
                     active !== null && active !== i ? "md:text-ink/35" : "text-ink",
                   )}
                 >
                   {s.name}
                 </span>
-                <span className="mt-1 block text-[0.92rem] text-ink-soft md:hidden">
+                <span className="mt-1 block text-[0.92rem] text-ink-soft md:hidden phone:mt-0.5 phone:block phone:text-[0.82rem] phone:leading-snug">
                   {s.duration} · {s.price}
                 </span>
               </span>
-              <span className="hidden text-right text-[0.92rem] text-ink-soft md:block">
+              <span className="hidden text-right text-[0.92rem] text-ink-soft md:block phone:hidden">
                 <span className="block">{s.duration}</span>
                 <span className="block font-semibold text-ink">{s.price}</span>
               </span>
@@ -83,7 +83,7 @@ export function TreatmentIndex({ items }: { items: IndexItem[] }) {
         ref={float}
         aria-hidden
         className={clsx(
-          "pointer-events-none absolute top-0 left-0 z-10 hidden h-[22rem] w-[17rem] -translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-700 ease-[var(--ease-soft)] md:block",
+          "pointer-events-none absolute top-0 left-0 z-10 hidden h-[22rem] w-[17rem] -translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-700 ease-[var(--ease-soft)] md:block phone:hidden",
           active === null ? "scale-75 opacity-0" : "scale-100 opacity-100",
         )}
       >

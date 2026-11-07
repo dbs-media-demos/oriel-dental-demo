@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import clsx from "clsx";
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { useDesktopGSAP, prefersReducedMotion } from "@/lib/motion";
 import { Photo } from "@/components/ui/Photo";
 import type { Img } from "@/content/images";
 
@@ -11,14 +11,14 @@ export type Chapter = { kicker: string; title: string; body: string; points: str
 /**
  * The new-patient journey. On desktop the arch window stays pinned while chapters
  * scroll past; each chapter wipes its photo up into the window. On phones every
- * chapter carries its own photo.
+ * chapter carries its own photo, in a row to swipe.
  */
 export function Journey({ chapters }: { chapters: Chapter[] }) {
   const root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap, ScrollTrigger }) => {
       const el = root.current;
       if (!el) return;
       const mm = gsap.matchMedia();
@@ -59,9 +59,9 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
   );
 
   return (
-    <div ref={root} className="relative grid gap-16 lg:grid-cols-[1fr_1fr] lg:gap-24">
+    <div ref={root} className="relative grid gap-16 pin:grid-cols-[1fr_1fr] pin:gap-24">
       {/* Pinned window (desktop) */}
-      <div className="sticky top-[calc(var(--header-h)+4vh)] hidden h-[82vh] self-start lg:block">
+      <div className="sticky top-[calc(var(--header-h)+4vh)] hidden h-[82vh] self-start pin:block">
         <div className="arch relative h-full w-full bg-linen">
           {chapters.map((c, i) => (
             <div key={c.title} data-layer className={clsx("absolute inset-0", i > 0 && "[clip-path:inset(100%_0%_0%_0%)]")}>
@@ -78,30 +78,30 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
       </div>
 
       {/* Chapters */}
-      <ol className="relative">
-        <span aria-hidden className="absolute top-2 bottom-2 left-[0.6rem] hidden w-px bg-line lg:block">
+      <ol className="swipe relative">
+        <span aria-hidden className="absolute top-2 bottom-2 left-[0.6rem] hidden w-px bg-line pin:block">
           <span data-thread className="absolute inset-0 origin-top bg-sage" />
         </span>
         {chapters.map((c, i) => (
-          <li key={c.title} data-chapter className="relative flex min-h-0 flex-col justify-center py-10 lg:min-h-[80vh] lg:pl-16">
+          <li key={c.title} data-chapter className="relative flex min-h-0 flex-col justify-center py-10 pin:min-h-[80vh] pin:pl-16 phone:justify-start phone:py-0">
             <span
               aria-hidden
               className={clsx(
-                "absolute top-1/2 left-0 hidden size-[1.3rem] -translate-y-1/2 rounded-t-full border-2 transition-colors duration-700 lg:block",
+                "absolute top-1/2 left-0 hidden size-[1.3rem] -translate-y-1/2 rounded-t-full border-2 transition-colors duration-700 pin:block",
                 active >= i ? "border-sage bg-sage" : "border-mist bg-porcelain",
               )}
             />
-            <div className="arch relative mb-8 aspect-[4/5] w-full max-w-md lg:hidden">
-              <Photo image={c.image} sizes="(min-width: 640px) 28rem, 90vw" />
+            <div className="arch relative mb-8 aspect-[4/5] w-full max-w-md pin:hidden phone:mb-2.5 phone:aspect-[3/2]">
+              <Photo image={c.image} sizes="(max-width: 767px) 62vw, (min-width: 640px) 28rem, 90vw" />
             </div>
             <p className="eyebrow text-sage">
               Step {i + 1} · {c.kicker}
             </p>
-            <h3 className="display h-md mt-5 max-w-[14ch]">{c.title}</h3>
-            <p className="lede mt-6 max-w-[34rem]">{c.body}</p>
-            <ul className="mt-8 flex flex-wrap gap-2">
+            <h3 className="display h-md mt-5 max-w-[14ch] phone:mt-1.5 phone:text-[1.25rem]">{c.title}</h3>
+            <p className="lede mt-6 max-w-[34rem] phone:mt-1.5 phone:text-[0.85rem] phone:leading-snug">{c.body}</p>
+            <ul className="mt-8 flex flex-wrap gap-2 phone:mt-2.5 phone:gap-1">
               {c.points.map((p) => (
-                <li key={p} className="rounded-full bg-shell px-4 py-2 text-[0.9rem] ring-1 ring-line">
+                <li key={p} className="rounded-full bg-shell px-4 py-2 text-[0.9rem] ring-1 ring-line phone:px-2.5 phone:py-0.5 phone:text-[0.75rem]">
                   {p}
                 </li>
               ))}

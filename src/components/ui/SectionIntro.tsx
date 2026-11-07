@@ -27,12 +27,12 @@ export function SectionIntro({
       <Reveal>
         <p className="eyebrow text-sage">{eyebrow}</p>
       </Reveal>
-      <SplitReveal as={as} id={id} className={clsx("display mt-6", size, align === "center" && "mx-auto")}>
+      <SplitReveal as={as} id={id} className={clsx("display mt-6 phone:mt-3", size, align === "center" && "mx-auto")}>
         {title}
       </SplitReveal>
       {lede && (
         <Reveal delay={0.15}>
-          <p className={clsx("lede mt-6 max-w-[40rem]", align === "center" && "mx-auto")}>{lede}</p>
+          <p className={clsx("lede mt-6 max-w-[40rem] phone:mt-3", align === "center" && "mx-auto")}>{lede}</p>
         </Reveal>
       )}
     </div>

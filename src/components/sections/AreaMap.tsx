@@ -18,8 +18,8 @@ const hoods = [
  */
 export function AreaMap() {
   return (
-    <InView className="group relative overflow-hidden rounded-[2rem] bg-linen">
-      <svg viewBox="0 0 800 620" className="block h-auto w-full" role="img" aria-labelledby="map-title map-desc">
+    <InView className="group relative overflow-hidden rounded-[2rem] bg-linen phone:h-[12.5rem] phone:rounded-3xl">
+      <svg viewBox="0 0 800 620" className="block h-auto w-full phone:absolute phone:top-1/2 phone:left-1/2 phone:w-[135%] phone:max-w-none phone:-translate-x-1/2 phone:-translate-y-1/2" role="img" aria-labelledby="map-title map-desc">
         <title id="map-title">Illustrated map of Uptown Dallas</title>
         <desc id="map-desc">
           Oriel Dental Studio sits in the middle of Uptown, between the Katy Trail and McKinney Avenue, a few minutes from Victory Park, Oak Lawn, Turtle Creek,

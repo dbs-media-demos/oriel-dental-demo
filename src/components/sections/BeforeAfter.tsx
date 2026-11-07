@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import clsx from "clsx";
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { useDesktopGSAP, isPhone, prefersReducedMotion } from "@/lib/motion";
 import type { Img } from "@/content/images";
 
 type Props = {
@@ -28,8 +28,8 @@ export function BeforeAfter({ before, after, label, className, sizes = "(min-wid
     setPos(Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100)));
   };
 
-  useGSAP(
-    () => {
+  useDesktopGSAP(
+    ({ gsap, ScrollTrigger }) => {
       const el = root.current;
       if (!el || !hint || prefersReducedMotion()) return;
       const proxy = { p: 50 };
@@ -54,8 +54,10 @@ export function BeforeAfter({ before, after, label, className, sizes = "(min-wid
     <div
       ref={root}
       data-cursor="Drag"
-      className={clsx("relative touch-pan-y overflow-hidden bg-linen select-none", className)}
+      className={clsx("relative touch-pan-y overflow-hidden bg-linen select-none phone:touch-auto", className)}
       onPointerDown={(e) => {
+        // In a swipe row on phones: the photo swipes the row, only the handle moves the divider
+        if (isPhone() && !(e.target as Element).closest("[role='slider']")) return;
         touched.current = true;
         dragging.current = true;
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -70,10 +72,10 @@ export function BeforeAfter({ before, after, label, className, sizes = "(min-wid
         <Image src={before.src} alt={`${label}: before (illustrative)`} fill sizes={sizes} className="object-cover" placeholder="blur" blurDataURL={before.blur} draggable={false} />
       </div>
 
-      <span className="pointer-events-none absolute top-4 left-4 rounded-full bg-night/55 px-3 py-1 text-[0.72rem] font-semibold tracking-[0.16em] text-porcelain uppercase backdrop-blur">
+      <span className="pointer-events-none absolute top-4 left-4 phone:top-auto phone:bottom-3 phone:left-3 rounded-full bg-night/55 px-3 py-1 text-[0.72rem] font-semibold tracking-[0.16em] text-porcelain uppercase backdrop-blur">
         Before
       </span>
-      <span className="pointer-events-none absolute top-4 right-4 rounded-full bg-porcelain/80 px-3 py-1 text-[0.72rem] font-semibold tracking-[0.16em] text-ink uppercase backdrop-blur">
+      <span className="pointer-events-none absolute top-4 right-4 phone:top-auto phone:right-3 phone:bottom-3 rounded-full bg-porcelain/80 px-3 py-1 text-[0.72rem] font-semibold tracking-[0.16em] text-ink uppercase backdrop-blur">
         After
       </span>
 
@@ -97,7 +99,7 @@ export function BeforeAfter({ before, after, label, className, sizes = "(min-wid
           touched.current = true;
           e.preventDefault();
         }}
-        className="absolute top-1/2 grid h-16 w-11 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize place-items-center rounded-t-full rounded-b-xl bg-porcelain text-ink shadow-[0_10px_30px_-8px_rgb(0_0_0/0.45)]"
+        className="absolute top-1/2 grid h-16 w-11 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize place-items-center phone:touch-none rounded-t-full rounded-b-xl bg-porcelain text-ink shadow-[0_10px_30px_-8px_rgb(0_0_0/0.45)]"
         style={{ left: `${pos}%` }}
       >
         <svg viewBox="0 0 24 12" className="mt-2 w-5" aria-hidden fill="none">

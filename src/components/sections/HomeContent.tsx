@@ -8,7 +8,8 @@ import { SmileGallery } from "@/components/sections/SmileGallery";
 import { ComfortMenu, type Comfort } from "@/components/sections/ComfortMenu";
 import { TeamTeaser } from "@/components/sections/TeamTeaser";
 import { OfficeRail, type RailItem } from "@/components/sections/OfficeRail";
-import { RatingSummary, ReviewMarquee } from "@/components/sections/ReviewsSection";
+import { RatingSummary, ReviewMarquee, ReviewStack } from "@/components/sections/ReviewsSection";
+import { PriceGuide } from "@/components/sections/PriceGuide";
 import { InsuranceChecker } from "@/components/sections/InsuranceChecker";
 import { AreaMap } from "@/components/sections/AreaMap";
 import { FinalCta } from "@/components/sections/FinalCta";
@@ -25,7 +26,8 @@ import { smileCases, caseTabs } from "@/content/gallery";
 import { homeFaqs } from "@/content/faqs";
 import { site, hours, fmtTime, fullAddress } from "@/content/site";
 import { defaultBiz } from "@/lib/biz";
-import { L, type Biz } from "@/lib/biz-core";
+import { L, num, type Biz } from "@/lib/biz-core";
+import { tr } from "@/lib/tr";
 import { scrub } from "@/lib/scrub";
 import { PreviewMap } from "@/components/preview/PreviewMap";
 
@@ -57,59 +59,78 @@ const previewMarquee = marqueeWords.filter((w) => w !== "Se habla español" && w
  * The homepage sections. The concept site renders them as they are; a personalised preview
  * (/for/<token>) passes a real business: its name, hours, rating and a map of its address replace
  * the fictional practice's, and the parts that only make sense for Oriel (its doctors, Uptown,
- * US insurance on Serbian pages) step aside.
+ * US insurance on Serbian pages) step aside. A Serbian preview also leaves out what Health Care Law
+ * art. 53 rules out as we read it: the smile gallery, result stories, promises and comparisons.
+ *
+ * `order` only takes effect on phones (.home-flow is a column there): first the things a patient
+ * looks for, in the order this niche needs them; desktop reads top to bottom as written.
  */
 export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; children?: ReactNode }) {
-  const index = services.map((s) => ({ slug: s.slug, name: s.name, duration: s.duration, price: s.price.split(" · ")[0], tagline: s.tagline, image: s.image }));
-  const words = biz.preview ? previewMarquee : marqueeWords;
   const sr = biz.lang === "sr";
+  const index = services.map((s) => ({
+    slug: s.slug,
+    name: tr(biz, s.name),
+    duration: tr(biz, s.duration),
+    price: tr(biz, s.price.split(" · ")[0]),
+    tagline: s.tagline,
+    image: s.image,
+  }));
+  const prices = services.map((s) => ({ slug: s.slug, name: s.name, duration: s.duration, price: s.price.split(" · ")[0] }));
+  const words = biz.preview ? previewMarquee : marqueeWords;
 
   return (
-    <>
+    <div className="home-flow">
       {children}
-      <HomeHero image={img.studioConsult} />
+      <div data-tr-first className="order-1">
+        <HomeHero image={img.studioConsult} />
+      </div>
 
-      <div className="border-y border-line bg-shell py-6">
+      <div data-tr-first className="order-2 border-y border-line bg-shell py-6 phone:py-2.5">
         <Marquee speed={70}>
           {words.map((w) => (
-            <span key={w} className="display flex items-center gap-10 pr-10 text-[clamp(1.4rem,2.4vw,2.2rem)] text-ink/80">
-              {w}
-              <span aria-hidden className="inline-block h-4 w-3 rounded-t-full bg-sand" />
+            <span key={w} className="display flex items-center gap-10 pr-10 text-[clamp(1.4rem,2.4vw,2.2rem)] text-ink/80 phone:gap-4 phone:pr-4 phone:text-[1.05rem] phone:whitespace-nowrap">
+              {tr(biz, w)}
+              <span aria-hidden className="inline-block h-4 w-3 rounded-t-full bg-sand phone:h-3 phone:w-2" />
             </span>
           ))}
         </Marquee>
       </div>
 
-      <Intro biz={biz} />
+      <div className="order-8">
+        <Intro biz={biz} />
+      </div>
 
       {/* Treatments */}
-      <section aria-labelledby="treatments-title" className="py-24 md:py-36">
+      <section data-tr-first aria-labelledby="treatments-title" className="order-3 py-24 md:py-36">
         <div className="container-x">
-          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end phone:flex-col phone:items-start phone:gap-0">
             <SectionIntro
               id="treatments-title"
-              eyebrow="Treatments"
+              eyebrow={tr(biz, "Treatments")}
               title={
                 <>
-                  Everything your smile needs, <em>under one arch.</em>
+                  {tr(biz, "Everything your smile needs,")} <em>{tr(biz, "under one arch.")}</em>
                 </>
               }
               className="max-w-3xl"
             />
-            <Reveal>
+            <Reveal className="phone:hidden">
               <Button href="/services" variant="ghost" icon={<Arrow />}>
-                Explore all treatments
+                {tr(biz, "Explore all treatments")}
               </Button>
             </Reveal>
           </div>
-          <div className="mt-16">
+          <div className="mt-16 phone:mt-4">
             <TreatmentIndex items={index} />
           </div>
+          <Link href="/services" className="link-underline mt-4 hidden font-semibold text-sage-deep phone:inline-block">
+            {tr(biz, "Explore all treatments")} →
+          </Link>
         </div>
       </section>
 
       {/* New-patient journey */}
-      <section aria-labelledby="journey-title" className="bg-shell py-24 md:py-36">
+      <section aria-labelledby="journey-title" className="order-9 bg-shell py-24 md:py-36">
         <div className="container-x">
           <SectionIntro
             id="journey-title"
@@ -122,16 +143,17 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
             lede="From booking to the gift bag, here is exactly what your first visit feels like. About 90 minutes, and nothing happens without your say-so."
             className="max-w-3xl"
           />
-          <div className="mt-16 md:mt-24">
+          <div className="mt-16 md:mt-24 phone:mt-4">
             <Journey chapters={journey.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
           </div>
         </div>
       </section>
 
-      {/* Smile gallery */}
-      <section aria-labelledby="smiles-title" className="py-24 md:py-36">
+      {/* Smile gallery (not on Serbian previews) */}
+      {!sr && (
+      <section aria-labelledby="smiles-title" className="order-11 py-24 md:py-36">
         <div className="container-x">
-          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end phone:flex-col phone:items-start phone:gap-0">
             <SectionIntro
               id="smiles-title"
               eyebrow="Smile gallery"
@@ -143,20 +165,24 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
               lede="Whitening, veneers, aligners and implants, shown as illustrative simulations so you know what each treatment can do."
               className="max-w-3xl"
             />
-            <Reveal>
+            <Reveal className="phone:hidden">
               <Button href="/smile-gallery" variant="ghost" icon={<Arrow />}>
                 Full smile gallery
               </Button>
             </Reveal>
           </div>
-          <div className="mt-14">
+          <div className="mt-14 phone:mt-4">
             <SmileGallery cases={smileCases} tabs={caseTabs} limit={3} featured />
           </div>
+          <Link href="/smile-gallery" className="link-underline mt-3 hidden font-semibold text-sage-deep phone:inline-block">
+            Full smile gallery →
+          </Link>
         </div>
       </section>
+      )}
 
       {/* Comfort menu */}
-      <section aria-labelledby="comfort-title" className="bg-mist-soft py-24 md:py-36">
+      <section aria-labelledby="comfort-title" className="order-10 bg-mist-soft py-24 md:py-36">
         <div className="container-x">
           <SectionIntro
             id="comfort-title"
@@ -169,11 +195,11 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
             lede="Pick your comforts when you book. We note them in your chart, so they're waiting for you every single time."
             className="max-w-3xl"
           />
-          <div className="mt-16">
+          <div className="mt-16 phone:mt-4">
             <ComfortMenu items={comfortsFor(biz)} />
           </div>
-          <Reveal className="mt-14">
-            <Link href="/services/sedation-dentistry" className="link-underline font-semibold text-sage-deep">
+          <Reveal className="mt-14 phone:mt-4">
+            <Link href="/services/sedation-dentistry" className="link-underline font-semibold text-sage-deep phone:text-[0.92rem]">
               Read about sedation & anxiety-free dentistry →
             </Link>
           </Reveal>
@@ -182,9 +208,9 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
 
       {/* Team (the fictional doctors: left out of previews) */}
       {!biz.preview && (
-      <section aria-labelledby="team-title" className="py-24 md:py-36">
+      <section aria-labelledby="team-title" className="order-5 py-24 md:py-36">
         <div className="container-x">
-          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end phone:flex-col phone:items-start phone:gap-0">
             <SectionIntro
               id="team-title"
               eyebrow="Your doctors"
@@ -195,39 +221,44 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
               }
               className="max-w-3xl"
             />
-            <Reveal>
+            <Reveal className="phone:hidden">
               <Button href="/team" variant="ghost" icon={<Arrow />}>
                 Meet the whole team
               </Button>
             </Reveal>
           </div>
-          <div className="mt-16">
+          <div className="mt-16 phone:mt-4">
             <TeamTeaser />
           </div>
+          <Link href="/team" className="link-underline mt-3 hidden font-semibold text-sage-deep phone:inline-block">
+            Meet the whole team →
+          </Link>
         </div>
       </section>
       )}
 
       {/* Office tour rail */}
+      <div className="order-12">
       <OfficeRail
         items={rail}
         intro={
           <div>
             <p className="eyebrow text-sage">The studio</p>
-            <h2 className="display h-md mt-5">
+            <h2 className="display h-md mt-5 phone:mt-3">
               Every chair <em>faces a window.</em>
             </h2>
-            <p className="lede mt-5">{biz.preview ? "A studio designed with an architect, not a dental catalog." : "A second-floor studio on Linden Row, designed with an architect, not a dental catalog."}</p>
-            <Link href="/office-tour" className="link-underline mt-6 inline-block font-semibold text-sage-deep">
+            <p className="lede mt-5 phone:mt-2.5">{biz.preview ? "A studio designed with an architect, not a dental catalog." : "A second-floor studio on Linden Row, designed with an architect, not a dental catalog."}</p>
+            <Link href="/office-tour" className="link-underline mt-6 inline-block font-semibold text-sage-deep phone:mt-2.5">
               Take the full tour →
             </Link>
           </div>
         }
       />
+      </div>
 
       {/* Reviews */}
-      <section aria-labelledby="reviews-title" className="overflow-hidden py-24 md:py-36">
-        <div className="container-x grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+      <section aria-labelledby="reviews-title" className="order-4 overflow-hidden py-24 md:py-36">
+        <div className="container-x grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:items-end phone:gap-3">
           <SectionIntro
             id="reviews-title"
             eyebrow="Reviews"
@@ -239,19 +270,24 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
           />
           {biz.rating && (
             <Reveal>
-              <RatingSummary rating={biz.rating} />
+              <RatingSummary rating={biz.rating} value={num(biz, biz.rating.value)} />
             </Reveal>
           )}
         </div>
-        <div className="mt-16">
-          <ReviewMarquee scrubFor={biz} />
+        <div className="mt-16 phone:mt-3">
+          <div className="phone:hidden">
+            <ReviewMarquee scrubFor={biz} />
+          </div>
+          <div className="hidden phone:block">
+            <ReviewStack scrubFor={biz} />
+          </div>
           {biz.preview && (
-            <p className="container-x mt-8 text-[0.95rem] text-ink-soft">
+            <p className="container-x mt-8 text-[0.95rem] text-ink-soft phone:mt-3 phone:text-[0.82rem] phone:leading-snug">
               Sample reviews. On your live site this shows your latest Google reviews, updated automatically.
             </p>
           )}
         </div>
-        <div className="container-x mt-12">
+        <div className="container-x mt-12 phone:mt-3">
           <Link href="/reviews" className="link-underline font-semibold text-sage-deep">
             {biz.rating ? L(biz, `Read all ${biz.rating.count} reviews →`, `Sve recenzije (${biz.rating.count}) →`) : "Read all reviews →"}
           </Link>
@@ -260,8 +296,8 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
 
       {/* Insurance (US plans: not on Serbian previews) */}
       {!sr && (
-      <section aria-labelledby="insurance-title" className="bg-shell py-24 md:py-36">
-        <div className="container-x grid gap-14 lg:grid-cols-2 lg:gap-24">
+      <section aria-labelledby="insurance-title" className="order-6 bg-shell py-24 md:py-36">
+        <div className="container-x grid gap-14 lg:grid-cols-2 lg:gap-24 phone:gap-4">
           <SectionIntro
             id="insurance-title"
             eyebrow="Insurance & financing"
@@ -279,12 +315,25 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
       </section>
       )}
 
+      {/* Price guidance on Serbian phones: desktop keeps its price list in the treatments above */}
+      {sr && (
+      <section aria-labelledby="prices-title" className="order-6 hidden bg-shell phone:block">
+        <div className="container-x">
+          <SectionIntro id="prices-title" eyebrow="Cene" title={<>Jasne cene, <em>pre početka.</em></>} lede="Izaberite uslugu i vidite okvirnu cenu i koliko traje. Konačnu cenu dobijate na pregledu, pre bilo kakve intervencije." size="h-md" />
+          <div className="mt-4">
+            <PriceGuide items={prices} />
+          </div>
+        </div>
+      </section>
+      )}
+
       {/* Location */}
+      <div className="order-7">
       {biz.preview ? (
         <PreviewMap biz={biz} />
       ) : (
       <section aria-labelledby="visit-title" className="py-24 md:py-36">
-        <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
+        <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.3fr] lg:gap-20 phone:gap-4">
           <div>
             <SectionIntro
               id="visit-title"
@@ -296,11 +345,11 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
               }
               size="h-md"
             />
-            <Reveal className="mt-8 space-y-6">
+            <Reveal className="mt-8 space-y-6 phone:mt-3 phone:space-y-3">
               <OpenBadge />
-              <address className="text-lg not-italic">{fullAddress}</address>
-              <p className="text-ink-soft">{site.parking}</p>
-              <dl className="grid max-w-sm grid-cols-[auto_1fr] gap-x-8 gap-y-1.5 text-[0.95rem]">
+              <address className="text-lg not-italic phone:text-base">{fullAddress}</address>
+              <p className="text-ink-soft phone:text-[0.9rem] phone:leading-snug">{site.parking}</p>
+              <dl className="grid max-w-sm grid-cols-[auto_1fr] gap-x-8 gap-y-1.5 text-[0.95rem] phone:gap-y-0.5 phone:text-[0.9rem]">
                 {hours.map((h) => (
                   <div key={h.day} className="contents">
                     <dt className="text-ink-soft">{h.label}</dt>
@@ -308,10 +357,15 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
                   </div>
                 ))}
               </dl>
-              <p className="text-[0.95rem] text-ink-soft">Serving {site.areaServed.join(", ")}.</p>
-              <Button href="/contact" variant="ghost" icon={<Arrow />}>
-                Directions & contact
-              </Button>
+              <p className="text-[0.95rem] text-ink-soft phone:text-[0.85rem] phone:leading-snug">Serving {site.areaServed.join(", ")}.</p>
+              <div>
+                <Button href="/contact" variant="ghost" icon={<Arrow />} className="phone:hidden">
+                  Directions & contact
+                </Button>
+                <Link href="/contact" className="link-underline hidden font-semibold text-sage-deep phone:inline-block">
+                  Directions & contact →
+                </Link>
+              </div>
             </Reveal>
           </div>
           <Reveal>
@@ -320,22 +374,24 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
         </div>
       </section>
       )}
+      </div>
 
       {/* FAQ */}
-      <section aria-labelledby="faq-title" className="pb-24 md:pb-36">
-        <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-24">
+      <section aria-labelledby="faq-title" className="order-13 pb-24 md:pb-36">
+        <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-24 phone:gap-3">
           <SectionIntro id="faq-title" eyebrow="Questions" title={<>Good to know</>} size="h-md" />
           <div>
             <FaqList items={homeFaqs.map((f) => ({ ...f, a: scrub(f.a, biz) }))} />
-            <Link href="/faq" className="link-underline mt-8 inline-block font-semibold text-sage-deep">
+            <Link href="/faq" className="link-underline mt-8 inline-block font-semibold text-sage-deep phone:mt-3">
               All frequently asked questions →
             </Link>
           </div>
         </div>
       </section>
 
-      <FinalCta biz={biz} />
-
-    </>
+      <div className="order-14">
+        <FinalCta biz={biz} />
+      </div>
+    </div>
   );
 }

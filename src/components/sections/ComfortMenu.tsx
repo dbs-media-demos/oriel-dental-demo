@@ -8,12 +8,39 @@ import type { Img } from "@/content/images";
 
 export type Comfort = { title: string; body: string; image: Img };
 
-/** Hover or focus a comfort and the window shows it; at rest, leaves sway in the light. */
+/**
+ * Hover or focus a comfort and the window shows it; at rest, leaves sway in the light.
+ * Phones get a row to swipe, opening with the breathing cue: the one small moving thing that
+ * belongs to a dentist's chair.
+ */
 export function ComfortMenu({ items }: { items: Comfort[] }) {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-24">
+    <>
+    <div className="swipe hidden">
+      <div className="arch relative grid min-h-64 place-items-center bg-shell p-5 text-center ring-1 ring-line">
+        <div>
+          <span aria-hidden className="mx-auto block size-20 rounded-full bg-sage/20 motion-safe:animate-[breathe_8s_var(--ease-breath)_infinite]">
+            <span className="m-auto block size-full scale-50 rounded-full bg-sage/40" />
+          </span>
+          <p className="display mt-4 text-[1.3rem] text-ink">Breathe in for four.</p>
+          <p className="mt-1 text-[0.88rem] text-ink-soft">Out for six. We&apos;ll wait.</p>
+        </div>
+      </div>
+      {items.map((c) => (
+        <figure key={c.title}>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-shell">
+            <Image src={c.image.src} alt="" fill sizes="(max-width: 767px) 62vw, 17rem" className="object-cover" placeholder="blur" blurDataURL={c.image.blur} />
+          </div>
+          <figcaption className="mt-2.5">
+            <p className="display text-[1.2rem]">{c.title}</p>
+            <p className="mt-1 text-[0.88rem] leading-snug text-ink-soft">{c.body}</p>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+    <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-24 phone:hidden">
       <div className="arch relative mx-auto aspect-[3/4] w-full max-w-[30rem] bg-shell lg:max-w-none">
         <AmbientVideo src="/video/leaf-light.mp4" poster="/video/leaf-light.jpg" />
         {items.map((c, i) => (
@@ -75,5 +102,6 @@ export function ComfortMenu({ items }: { items: Comfort[] }) {
         ))}
       </ul>
     </div>
+    </>
   );
 }

@@ -16,22 +16,22 @@ export function FinalCta({
   biz?: Biz;
 }) {
   return (
-    <section aria-labelledby="cta-title" className="px-3 pb-3 md:px-5 md:pb-5">
+    <section aria-labelledby="cta-title" className="flush-y px-3 pb-3 md:px-5 md:pb-5">
       <div className="relative isolate overflow-hidden rounded-t-[min(40vw,28rem)] rounded-b-[2rem] bg-sand-soft">
         <AmbientVideo src="/video/golden-hour.mp4" poster="/video/golden-hour.jpg" className="opacity-60 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-b from-porcelain/10 via-porcelain/30 to-porcelain/70" />
-        <div className="relative container-x flex min-h-[80svh] flex-col items-center justify-center py-28 text-center">
+        <div className="relative container-x flex min-h-[80svh] flex-col items-center justify-center py-28 text-center phone:min-h-0 phone:py-10">
           <Reveal>
             <p className="eyebrow text-sage-deep">{eyebrow}</p>
           </Reveal>
-          <SplitReveal id="cta-title" className="display h-lg mt-6 max-w-[15ch]">
+          <SplitReveal id="cta-title" className="display h-lg mt-6 max-w-[15ch] phone:mt-3">
             {title}
           </SplitReveal>
           <Reveal delay={0.2}>
-            <p className="lede mx-auto mt-6 max-w-[36rem] text-ink">
+            <p className="lede mx-auto mt-6 max-w-[36rem] text-ink phone:mt-3">
               <strong className="font-semibold">{site.newPatientOffer.title}:</strong> {site.newPatientOffer.detail}
             </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3 phone:mt-5 phone:gap-2">
               <Button href="/book" icon={<Arrow />}>
                 Book online
               </Button>

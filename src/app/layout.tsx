@@ -8,10 +8,12 @@ import { site, siteUrl, noindex } from "@/content/site";
 import { ogImageUrl } from "@/lib/seo";
 
 // Fraunces, self-hosted and instanced at weight 300 / SOFT 100 (optical size stays variable):
-// ~75 KB for both styles instead of ~270 KB for the full variable family.
+// ~75 KB for both styles instead of ~270 KB for the full variable family. Desktop only: phones
+// use two smaller files (globals.css), so nothing here is preloaded.
 const fraunces = localFont({
   variable: "--font-fraunces",
   display: "swap",
+  preload: false,
   src: [
     { path: "../assets/fonts/Fraunces-300-soft.woff2", weight: "300", style: "normal" },
     { path: "../assets/fonts/Fraunces-300-soft-italic.woff2", weight: "300", style: "italic" },
@@ -37,7 +39,10 @@ const figtree = Figtree({
   subsets: ["latin", "latin-ext"],
   variable: "--font-figtree",
   display: "swap",
+  preload: false,
 });
+
+const PHONE_MEDIA = "(max-width: 767.98px), (hover: none) and (max-width: 1023.98px), (pointer: coarse) and (max-width: 1023.98px)";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -67,6 +72,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${fraunces.variable} ${frauncesExt.variable} ${figtree.variable}`}>
       <body>
+        <link rel="preload" href="/fonts/fraunces-phone.woff2" as="font" type="font/woff2" crossOrigin="anonymous" media={PHONE_MEDIA} />
+        <link rel="preload" href="/fonts/fraunces-phone-italic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" media={PHONE_MEDIA} />
         <a
           href="#main"
           className="fixed top-3 left-3 z-[80] -translate-y-24 rounded-full bg-ink px-5 py-3 font-semibold text-porcelain transition-transform focus:translate-y-0"

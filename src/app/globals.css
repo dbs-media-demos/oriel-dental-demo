@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+/* Keep in sync with src/lib/motion.ts. `phone` = the stacked phone layout; `still` = no scroll-driven motion; `pin` = pinned desktop scenes. */
+@custom-variant still {
+  @media (hover: none), (pointer: coarse) {
+    @slot;
+  }
+}
+@custom-variant pin (@media (min-width: 1024px) and (hover: hover) and (pointer: fine));
+@custom-variant phone {
+  @media (max-width: 767.98px), (hover: none) and (max-width: 1023.98px), (pointer: coarse) and (max-width: 1023.98px) {
+    @slot;
+  }
+}
+
+/* Phones load these two files and nothing else (scripts/gen-phone-fonts.py); desktop keeps its fonts from layout.tsx. */
+@font-face {
+  font-family: "Fraunces Phone";
+  src: url("/fonts/fraunces-phone.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces Phone";
+  src: url("/fonts/fraunces-phone-italic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+/* Same line breaks before and after the font arrives, so the headline doesn't jump. */
+@font-face {
+  font-family: "Fraunces Phone Fallback";
+  src: local("Arial"), local("Helvetica"), local("Roboto");
+  size-adjust: 94%;
+  ascent-override: 104.04%;
+  descent-override: 27.13%;
+  line-gap-override: 0%;
+}
+
 /* ───────────────────────── Oriel design tokens ───────────────────────── */
 @theme {
   --color-porcelain: #f7f4ee;
@@ -359,6 +397,187 @@ body::after {
 }
 :root {
   interpolate-size: allow-keywords;
+}
+
+/* ───────────────────────── Phones ───────────────────────── */
+@media (max-width: 767.98px), (hover: none) and (max-width: 1023.98px), (pointer: coarse) and (max-width: 1023.98px) {
+  :root {
+    --gutter: 1rem;
+    --header-h: 64px;
+    --hero-photo: clamp(136px, calc(100svh - 30.5rem), 340px);
+    --font-display: "Fraunces Phone", "Fraunces Phone Fallback", Georgia, serif;
+    --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  body {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .display {
+    line-height: 1.04;
+  }
+  .eyebrow {
+    font-size: 0.6875rem;
+  }
+  .h-lg {
+    font-size: 2.05rem;
+  }
+  .h-md {
+    font-size: 1.8rem;
+  }
+  .h-sm {
+    font-size: 1.35rem;
+  }
+  .lede {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* The homepage's order follows what a patient looks for; desktop ignores `order`. */
+  .home-flow {
+    display: flex;
+    flex-direction: column;
+  }
+  .home-flow > * {
+    min-width: 0;
+  }
+  .home-flow section:not(.flush-y, [data-hero]) {
+    padding-block: 1.875rem;
+  }
+
+  /* First screen: paints whole, nothing faded in, and the next section peeks over the bar. */
+  .anim-heading,
+  .anim-fade,
+  .anim-settle,
+  .anim-arch {
+    animation: none;
+  }
+  .hero-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-top: calc(var(--header-h) + 0.25rem);
+  }
+  .hero-frame {
+    position: relative;
+    inset: auto;
+    width: auto;
+    max-width: 36rem;
+    height: var(--hero-photo);
+    margin-inline: max(var(--gutter), calc(50% - 18rem));
+    clip-path: none;
+    border-radius: 999px 999px 1.25rem 1.25rem;
+    overflow: hidden;
+    isolation: isolate;
+    will-change: auto;
+  }
+  .hero-frame img {
+    object-position: 26% 34% !important;
+  }
+  .hero-shutters {
+    display: none;
+  }
+  .hero-copy {
+    display: block;
+    height: auto;
+    padding-block: 0.875rem 1rem;
+  }
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+  @media (max-height: 600px) {
+    .hero-badge {
+      display: none;
+    }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    :root {
+      --hero-photo: calc(100svh - var(--header-h) - 5.25rem);
+    }
+    .hero-stage {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      align-items: start;
+      gap: 1rem;
+    }
+    .hero-frame {
+      margin-inline: var(--gutter) 0;
+    }
+    .hero-copy {
+      padding-block: 0;
+    }
+    .hero-badge {
+      display: none;
+    }
+    .hero-text h1 {
+      margin-top: 0;
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Swipeable rows: the next item half showing, a vertical swipe still scrolls the page. */
+  .swipe {
+    display: flex;
+    gap: 0.75rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .swipe::-webkit-scrollbar {
+    display: none;
+  }
+  .swipe > * {
+    flex: none;
+    width: min(62vw, 17rem);
+    scroll-snap-align: start;
+  }
+  .swipe-wide > * {
+    width: min(78vw, 22rem);
+  }
+  .swipe-flush {
+    margin-inline: 0;
+  }
+
+  /* One small fade-and-rise per section (PhoneRise), and a press you can feel. */
+  .rise-wait {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .rise-in {
+    transition:
+      opacity 0.6s var(--ease-soft),
+      transform 0.6s var(--ease-soft);
+  }
+  a,
+  button,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .map-draw {
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .map-label {
+    opacity: 1 !important;
+    transition: none;
+  }
+  .map-pulse {
+    animation: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    a:active,
+    button:active,
+    summary:active {
+      transform: scale(0.975);
+      transition: transform 0.12s var(--ease-soft);
+    }
+  }
 }
 
 /* ───────────────────────── Page transitions ───────────────────────── */

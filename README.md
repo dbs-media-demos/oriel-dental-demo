@@ -21,4 +21,4 @@ npm run lint
 - **Forms send nothing.** Booking and contact forms validate and show a success state only.
 - **Images:** `public/images` (Unsplash) and `public/video` (Pexels). Credits are in `public/images/SOURCES.md`. After adding or replacing photos, run `python scripts/gen-images.py` to regenerate `src/content/images.ts` (dimensions, blur placeholders, alt text).
 - **Smile gallery:** the before/after pairs in `public/images/smile` are the same stock photo with a digitally simulated tooth shade. They're labelled "Illustrative" on the site.
-- **Fonts:** Fraunces is self-hosted (`src/assets/fonts`) and instanced at weight 300 / SOFT 100 to keep it small. The TTFs in the same folder are only used by the `/api/og` share-image route.
+- **Fonts:** Fraunces is self-hosted (`src/assets/fonts`) and instanced at weight 300 / SOFT 100 to keep it small. The TTFs in the same folder are only used by the `/api/og` share-image route. Phones load two smaller files from `public/fonts` instead (`scripts/gen-phone-fonts.py`) and a system sans for body text.

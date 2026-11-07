@@ -20,6 +20,10 @@
   - Mobile inner pages: P 83–94 (local production build and live). Desktop: P 99–100, A 100, BP 100 on home, services and team.
   - CLS 0 everywhere. Reduced-motion mode verified (no pinning, parallax, scrub or autoplay; all content visible).
 
+- Phone pass (7 Nov 2026, production build at 375 x 812; JS, total and fonts are gzip transfer, LCP on throttled 1.6 Mbps + 4x CPU): 12 screens (was 29), reviews start on screen 3 (was 20), JS 186 KB, total 445 KB, fonts 45 KB in 2 files, LCP 1.9 s, CLS 0. Desktop (1024 px and up) unchanged.
+  - Phones and touch never download GSAP or Lenis (`src/lib/motion.ts`), get no video and use their own two font files (`scripts/gen-phone-fonts.py`). Phone layout lives in the `phone` Tailwind variant and the Phones block in `globals.css`; the section order is `order-*` in `HomeContent.tsx`.
+  - Serbian previews (biz.lang === "sr", our reading of Health Care Law art. 53 and the chamber's code): no smile gallery or before/after, only reviews marked `neutral`, no result counts, promises, "best" or comparisons, neutral service wording; the price list stays, with a small price tool on phones. The first screen is Serbian in the server's HTML (`useT`, `tr`), so nothing waits for Translate.
+
 ## Portfolio copy
 EN title: Oriel Dental Studio
 EN one-liner (≤ 120 chars): A calm, light-filled dental studio site for Uptown Dallas, with an arched-window hero, smile sliders and booking in 60 seconds.
