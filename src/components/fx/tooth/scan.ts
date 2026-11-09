@@ -27,6 +27,7 @@ import {
   type Texture,
 } from "three";
 import { cone, ell, meshSdf, molarGeometry, roundBox, smin } from "./molar";
+import { MAX_DPR } from "./scene";
 
 /*
  * The new-patient exam's 3D scan: a lower arch (incisors, canines, premolars, molars, gums) as the
@@ -34,7 +35,7 @@ import { cone, ell, meshSdf, molarGeometry, roundBox, smin } from "./molar";
  * passes in a soft sage glow and leaves solid porcelain behind. Scroll drives the scan. It is cut flat
  * underneath, the way a real scan stops at the gums.
  *
- * Desktop only, imported with `await import()` after a media check; the same scene renders the stills.
+ * Desktop only, in the same worker as the hero (fx/tooth/worker.ts); the same scene renders the stills.
  */
 
 /** Square reference frame: the live camera crops it like the still's `object-fit: cover`. */
@@ -153,15 +154,29 @@ export type ScanScene = {
   /** How far the scan has come: 0 (nothing) … 1 (the whole arch). */
   progress: (p: number) => void;
   setVisible: (v: boolean) => void;
-  resize: () => void;
+  resize: (w?: number, h?: number, dpr?: number) => void;
   onReady: (cb: () => void) => void;
   dispose: () => void;
 };
 
 const pause = () => new Promise<void>((r) => setTimeout(r, 0));
 
-export async function createScan(canvas: HTMLCanvasElement, opts: { still?: boolean; at?: number } = {}): Promise<ScanScene> {
-  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance", preserveDrawingBuffer: !!opts.still });
+type ScanOptions = {
+  still?: boolean;
+  at?: number;
+  size?: { w: number; h: number; dpr: number };
+  onFrame?: (now: number, fresh: boolean) => void;
+};
+
+export async function createScan(canvas: HTMLCanvasElement | OffscreenCanvas, opts: ScanOptions = {}): Promise<ScanScene> {
+  const renderer = new WebGLRenderer({
+    canvas,
+    antialias: true,
+    alpha: false,
+    powerPreference: "high-performance",
+    failIfMajorPerformanceCaveat: !opts.still,
+    preserveDrawingBuffer: !!opts.still,
+  });
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -270,6 +285,7 @@ export async function createScan(canvas: HTMLCanvasElement, opts: { still?: bool
   let last = 0;
   let ready: (() => void) | null = null;
   let drawn = false;
+  let css = opts.size;
 
   const place = () => {
     const turn = Math.sin(st.t * 0.22) * 0.22 + (st.p - 0.5) * 0.5;
@@ -299,21 +315,24 @@ export async function createScan(canvas: HTMLCanvasElement, opts: { still?: bool
   };
   const frame = (now: number) => {
     const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
+    opts.onFrame?.(now, !last);
     last = now;
     st.t += dt;
     st.p += (st.target - st.p) * Math.min(1, dt * 6);
     draw();
-    raf = visible && !document.hidden ? requestAnimationFrame(frame) : 0;
+    raf = visible ? requestAnimationFrame(frame) : 0;
     if (!raf) last = 0;
   };
   const wake = () => {
-    if (!raf && visible && !opts.still && !document.hidden) raf = requestAnimationFrame(frame);
+    if (!raf && visible && !opts.still) raf = requestAnimationFrame(frame);
   };
 
-  const resize = () => {
-    const w = canvas.clientWidth || canvas.width;
-    const h = canvas.clientHeight || canvas.height;
-    renderer.setPixelRatio(opts.still ? 1 : Math.min(window.devicePixelRatio || 1, 1.75));
+  const resize = (cw?: number, ch?: number, dpr?: number) => {
+    if (cw && ch) css = { w: cw, h: ch, dpr: dpr ?? 1 };
+    const el = canvas as HTMLCanvasElement;
+    const w = css?.w ?? (el.clientWidth || canvas.width);
+    const h = css?.h ?? (el.clientHeight || canvas.height);
+    renderer.setPixelRatio(opts.still ? 1 : Math.min(css?.dpr ?? 1, MAX_DPR));
     renderer.setSize(w, h, false);
     // crop the square reference frame like object-fit: cover, centred
     const k = Math.max(w, h) / SCAN_REF;
@@ -323,15 +342,11 @@ export async function createScan(canvas: HTMLCanvasElement, opts: { still?: bool
     camera.updateProjectionMatrix();
     draw();
   };
+  // compiled in parallel, then one frame drawn while the canvas is still hidden
   place();
   await renderer.compileAsync(scene, camera);
   await pause();
   resize();
-
-  const onVis = () => {
-    if (!document.hidden) wake();
-  };
-  document.addEventListener("visibilitychange", onVis);
 
   return {
     progress(p) {
@@ -349,12 +364,12 @@ export async function createScan(canvas: HTMLCanvasElement, opts: { still?: bool
     },
     dispose() {
       cancelAnimationFrame(raf);
-      document.removeEventListener("visibilitychange", onVis);
       for (const g of [molar, premolar, canineGeo, incisorGeo, gumGeo, capGeo]) g.dispose();
       enamel.dispose();
       gum.dispose();
       env.dispose();
       renderer.dispose();
+      if (!opts.still) renderer.forceContextLoss();
     },
   };
 }

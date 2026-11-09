@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import type { ScanScene } from "@/components/fx/tooth/scan";
-
-const DESK_3D = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+import { afterFirst, afterLoad, canLive3D, cpuFast, FX_OFF, idle, stillOnly } from "@/components/fx/guard";
+import type { LiveScene } from "@/components/fx/tooth/live";
 
 /** The journey's scroll announces the exam step's scan progress (0…1) and whether it's on screen. */
 export const SCAN_PROGRESS = "oriel:scan-progress";
@@ -13,65 +12,81 @@ export type ScanDetail = { progress: number; active: boolean };
 /**
  * The exam step's window on desktop: the 3D scan of a lower arch, built as you scroll through the
  * step (points ahead of the scan line, porcelain behind it). The server HTML carries a still of the
- * finished scan; the live scene (three.js via `await import()`, desktop with a mouse only) is built
- * when the journey comes near, while this window is still hidden behind the previous photo.
+ * finished scan; the live scene (in the 3D worker, desktop with a mouse only, see fx/guard.ts) warms up
+ * while the browser is idle after the hero has settled, long before the journey is reached: built,
+ * compiled and drawn once out of sight. Its first 2 s on screen are watched like the hero's.
  */
 export function ScanWindow({ className }: { className?: string }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const host = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
 
   useEffect(() => {
-    const el = canvas.current;
-    if (!el) return;
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    if (!window.matchMedia(DESK_3D).matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches || conn?.saveData) return;
+    const el = host.current;
+    if (!el || !canLive3D()) return;
 
     let cancelled = false;
-    let sc: ScanScene | undefined;
+    let live: LiveScene | undefined;
     let detail: ScanDetail = { progress: 0, active: false };
+    let timer = 0;
+    const running = () => detail.active && !document.hidden;
     const onProgress = (e: Event) => {
       detail = (e as CustomEvent<ScanDetail>).detail;
-      sc?.progress(detail.progress);
-      sc?.setVisible(detail.active);
+      live?.call("progress", detail.progress);
+      live?.call("setVisible", running());
     };
+    const onVis = () => live?.call("setVisible", running());
     window.addEventListener(SCAN_PROGRESS, onProgress);
+    document.addEventListener("visibilitychange", onVis);
     let ro: ResizeObserver | undefined;
+    const canvas = document.createElement("canvas");
+    canvas.className = "absolute inset-0 h-full w-full";
+
+    const unlisten = () => {
+      ro?.disconnect();
+      window.removeEventListener(SCAN_PROGRESS, onProgress);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener(FX_OFF, stop);
+    };
+    const stop = () => {
+      cancelled = true;
+      unlisten();
+      setOn(false);
+      timer = window.setTimeout(() => live?.dispose(), 800);
+    };
+    window.addEventListener(FX_OFF, stop);
 
     const start = async () => {
-      try {
-        const { createScan } = await import("@/components/fx/tooth/scan");
-        if (cancelled) return;
-        sc = await createScan(el);
-        if (cancelled) return sc.dispose();
-      } catch {
-        return; // no WebGL: the still stays
-      }
-      const scene = sc;
-      scene.progress(detail.progress);
-      scene.setVisible(detail.active);
-      scene.onReady(() => !cancelled && setOn(true));
-      ro = new ResizeObserver(() => scene.resize());
-      ro.observe(el);
+      await afterLoad();
+      await afterFirst();
+      await idle(1500);
+      if (cancelled || stillOnly() || !(await cpuFast()) || cancelled) return;
+      const { mount } = await import("@/components/fx/tooth/live");
+      if (cancelled) return;
+      el.appendChild(canvas);
+      const size = () => ({ w: canvas.clientWidth, h: canvas.clientHeight, dpr: window.devicePixelRatio || 1 });
+      const scene = (live = mount("scan", canvas, size(), {
+        ready: () => {
+          if (cancelled) return;
+          setOn(true);
+          scene.watch(running);
+        },
+      }));
+      scene.call("progress", detail.progress);
+      scene.call("setVisible", running());
+      ro = new ResizeObserver(() => {
+        const s = size();
+        scene.call("resize", s.w, s.h, s.dpr);
+      });
+      ro.observe(canvas);
     };
-
-    // Built when the journey is a screen or so away, never during the hero's opening
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 120));
-        ric(() => void start(), { timeout: 1500 });
-      },
-      { rootMargin: "150% 0px" },
-    );
-    io.observe(el.closest("section") ?? el);
+    void start();
 
     return () => {
       cancelled = true;
-      io.disconnect();
-      ro?.disconnect();
-      window.removeEventListener(SCAN_PROGRESS, onProgress);
-      sc?.dispose();
+      clearTimeout(timer);
+      unlisten();
+      live?.dispose();
+      canvas.remove();
     };
   }, []);
 
@@ -91,7 +106,8 @@ export function ScanWindow({ className }: { className?: string }) {
           className={clsx("absolute inset-0 h-full w-full object-cover transition-opacity duration-500", on && "opacity-0")}
         />
       </picture>
-      <canvas ref={canvas} className={clsx("absolute inset-0 h-full w-full", on ? "opacity-100" : "opacity-0")} />
+      {/* The live canvas goes in here (made in the effect: it's handed to the worker) */}
+      <div ref={host} data-fx="scan" data-on={on || undefined} className={clsx("absolute inset-0", on ? "opacity-100" : "opacity-0 transition-opacity delay-500 duration-300")} />
     </div>
   );
 }

@@ -38,8 +38,9 @@ import { molarGeometry } from "./molar";
  * light cookie on the sun (a small texture drawn every frame), so their shadows fall across the wall
  * AND wrap around the tooth; the tooth and the plinth cast real soft shadows of their own.
  *
- * Desktop only: the hero imports this module with `await import()` after a media check, so phones
- * never download three.js. The same scene renders the stills (scripts/render-tooth.mjs).
+ * Desktop only: it runs in a worker on an OffscreenCanvas (fx/tooth/worker.ts), started after the
+ * checks in fx/guard.ts, so phones never download three.js and building or drawing it never holds up
+ * the page. The same scene renders the stills (scripts/render-tooth.mjs).
  */
 
 /** The still is rendered at this size; the live camera crops it exactly like `object-fit: cover`. */
@@ -61,7 +62,15 @@ function rng(seed: number) {
   return () => (s = (s * 16807) % 2147483647) / 2147483647;
 }
 
-function canvas2d(w: number, h: number) {
+/** A 2D canvas for the textures: an OffscreenCanvas in the worker, a plain one for the stills. */
+export function canvas2d(w: number, h: number) {
+  if (typeof document === "undefined") {
+    const c = new OffscreenCanvas(w, h);
+    const ctx = c.getContext("2d")!;
+    // the far branches are blurred; a context that can't blur would draw a different room
+    if (!("filter" in ctx)) throw new Error("no canvas filter");
+    return [c, ctx] as const;
+  }
   const c = document.createElement("canvas");
   c.width = w;
   c.height = h;
@@ -291,9 +300,11 @@ export type ToothScene = {
   clip: (inset: { t: number; r: number; b: number; l: number } | null) => void;
   /** The opening move: a breath of wind through the branches and a quicker turn that settles. */
   intro: () => void;
-  resize: () => void;
+  /** The canvas's CSS size and the screen's pixel ratio (the worker can't measure them itself). */
+  resize: (w?: number, h?: number, dpr?: number) => void;
   /** Called once the first frame is on the canvas. */
   onReady: (cb: () => void) => void;
+  /** On screen and the tab showing: frames run only while this is true. */
   setVisible: (v: boolean) => void;
   dispose: () => void;
 };
@@ -303,17 +314,26 @@ export type ToothOptions = {
   still?: boolean;
   /** The phones' cameo: close on the tooth and the plinth's top. */
   cameo?: boolean;
+  /** The canvas's CSS size and pixel ratio, where the canvas can't be measured (OffscreenCanvas). */
+  size?: { w: number; h: number; dpr: number };
+  /** Every live frame's time; `fresh` when the loop has just (re)started. For the frame watch. */
+  onFrame?: (now: number, fresh: boolean) => void;
 };
+
+/** Never more pixels than this per CSS pixel: the room looks the same and costs far less on a 2x screen. */
+export const MAX_DPR = 1.5;
 
 /** Hands the main thread back between setup steps, so building the scene is never one long task. */
 const pause = () => new Promise<void>((r) => setTimeout(r, 0));
 
-export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions = {}): Promise<ToothScene> {
+export async function createTooth(canvas: HTMLCanvasElement | OffscreenCanvas, opts: ToothOptions = {}): Promise<ToothScene> {
   const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
     alpha: false,
     powerPreference: "high-performance",
+    // live: no context at all rather than a software or blocklisted one (the still stays)
+    failIfMajorPerformanceCaveat: !opts.still,
     preserveDrawingBuffer: !!opts.still,
   });
   renderer.outputColorSpace = SRGBColorSpace;
@@ -440,6 +460,7 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
   let ready: (() => void) | null = null;
   let drawn = false;
   let clip: { t: number; r: number; b: number; l: number } | null = null;
+  let css = opts.size;
   const size = new Vector2();
 
   const sunWarm = new Color(0xfff3e2);
@@ -482,7 +503,8 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
     renderer.setRenderTarget(null);
     renderer.getSize(size);
     if (clip && !opts.still) {
-      const m = 24;
+      // a wide margin: the arch's clip-path moves on the page's thread, this canvas on the worker's
+      const m = 64;
       const x = Math.max(0, clip.l - m);
       const y = Math.max(0, clip.b - m);
       const w = Math.max(1, size.x - x - Math.max(0, clip.r - m));
@@ -510,20 +532,23 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
   // the tab is visible, and stop the moment it isn't
   const frame = (now: number) => {
     const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
+    opts.onFrame?.(now, !last);
     last = now;
     step(dt);
     draw();
-    raf = visible && !document.hidden ? requestAnimationFrame(frame) : 0;
+    raf = visible ? requestAnimationFrame(frame) : 0;
     if (!raf) last = 0;
   };
   const wake = () => {
-    if (!raf && visible && !opts.still && !document.hidden) raf = requestAnimationFrame(frame);
+    if (!raf && visible && !opts.still) raf = requestAnimationFrame(frame);
   };
 
-  const resize = () => {
-    const w = canvas.clientWidth || canvas.width;
-    const h = canvas.clientHeight || canvas.height;
-    renderer.setPixelRatio(opts.still ? 1 : Math.min(window.devicePixelRatio || 1, 1.75));
+  const resize = (cw?: number, ch?: number, dpr?: number) => {
+    if (cw && ch) css = { w: cw, h: ch, dpr: dpr ?? 1 };
+    const el = canvas as HTMLCanvasElement;
+    const w = css?.w ?? (el.clientWidth || canvas.width);
+    const h = css?.h ?? (el.clientHeight || canvas.height);
+    renderer.setPixelRatio(opts.still ? 1 : Math.min(css?.dpr ?? 1, MAX_DPR));
     renderer.setSize(w, h, false);
     if (opts.cameo) {
       camera.aspect = w / h;
@@ -539,16 +564,13 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
     camera.updateProjectionMatrix();
     draw();
   };
-  // Shaders compile in parallel where the GPU driver allows it, off the main thread
+  // Shaders compile in parallel where the GPU driver allows it; then one frame is drawn while the
+  // canvas is still hidden, which builds the shadow map's and the cookie's programs too
   place();
   await renderer.compileAsync(scene, camera);
+  await renderer.compileAsync(goboScene, goboCam);
   await pause();
   resize();
-
-  const onVis = () => {
-    if (!document.hidden) wake();
-  };
-  document.addEventListener("visibilitychange", onVis);
 
   return {
     pointer(x, y) {
@@ -578,7 +600,6 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
     },
     dispose() {
       cancelAnimationFrame(raf);
-      document.removeEventListener("visibilitychange", onVis);
       scene.traverse((o) => {
         if (o instanceof Mesh) {
           o.geometry.dispose();
@@ -593,6 +614,7 @@ export async function createTooth(canvas: HTMLCanvasElement, opts: ToothOptions 
       gobo.dispose();
       sun.shadow.map?.dispose();
       renderer.dispose();
+      if (!opts.still) renderer.forceContextLoss();
     },
   };
 }
