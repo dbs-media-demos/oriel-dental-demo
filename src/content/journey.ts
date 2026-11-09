@@ -22,6 +22,7 @@ export const journey: Chapter[] = [
     body: "No goopy impressions. A three-minute 3D scan and low-dose digital x-rays show us everything, and we show it all to you on the screen above the chair.",
     points: ["3D intraoral scan", "80% less radiation", "See what we see"],
     image: img.scanPatient,
+    scan: true,
   },
   {
     kicker: "Plan",

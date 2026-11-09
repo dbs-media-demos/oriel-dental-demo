@@ -412,7 +412,7 @@ body::after {
   :root {
     --gutter: 1rem;
     --header-h: 64px;
-    --hero-photo: clamp(136px, calc(100svh - 30.5rem), 340px);
+    --hero-photo: clamp(136px, calc(100svh - 32rem), 340px);
     --font-display: "Fraunces Phone", "Fraunces Phone Fallback", Georgia, serif;
     --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }

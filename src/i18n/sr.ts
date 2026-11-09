@@ -105,6 +105,7 @@ export const sr: Record<string, string> = {
   "Lavender tea": "Čaj od lavande",
   Exam: "Pregled",
   "A gentle exam with a 3D scan.": "Nežan pregled uz 3D skeniranje.",
+  "A 3D scan of a lower dental arch, the kind we take at your first exam": "3D sken donjeg zubnog niza, kakav pravimo na prvom pregledu",
   "No goopy impressions. A three-minute 3D scan and low-dose digital x-rays show us everything, and we show it all to you on the screen above the chair.":
     "Bez otisne mase. Trominutni 3D sken i digitalni snimci sa malo zračenja pokažu nam sve, a mi sve to pokažemo vama na ekranu iznad stolice.",
   "3D intraoral scan": "3D intraoralni sken",

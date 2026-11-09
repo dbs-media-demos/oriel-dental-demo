@@ -4,14 +4,17 @@ import { useRef, useState } from "react";
 import clsx from "clsx";
 import { useDesktopGSAP, prefersReducedMotion } from "@/lib/motion";
 import { Photo } from "@/components/ui/Photo";
+import { ScanWindow, ScanStill, SCAN_PROGRESS, type ScanDetail } from "@/components/sections/ScanWindow";
 import type { Img } from "@/content/images";
 
-export type Chapter = { kicker: string; title: string; body: string; points: string[]; image: Img };
+/** `scan`: the exam step, whose window shows the 3D scan instead of a photo. */
+export type Chapter = { kicker: string; title: string; body: string; points: string[]; image: Img; scan?: boolean };
 
 /**
  * The new-patient journey. On desktop the arch window stays pinned while chapters
- * scroll past; each chapter wipes its photo up into the window. On phones every
- * chapter carries its own photo, in a row to swipe.
+ * scroll past; each chapter wipes its photo up into the window, and the exam step's
+ * window is the 3D scan, built as you read it. On phones every chapter carries its
+ * own photo (the exam: a still of the finished scan), in a row to swipe.
  */
 export function Journey({ chapters }: { chapters: Chapter[] }) {
   const root = useRef<HTMLDivElement>(null);
@@ -28,6 +31,18 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
         const reduce = prefersReducedMotion();
         if (reduce) gsap.set(layers.slice(1), { opacity: 0, clipPath: "inset(0% 0% 0% 0%)" });
         steps.forEach((step, i) => {
+          if (chapters[i].scan) {
+            // The scan runs while you read the step; it draws only while its window can be seen
+            const send = (detail: ScanDetail) => window.dispatchEvent(new CustomEvent(SCAN_PROGRESS, { detail }));
+            const run = ScrollTrigger.create({ trigger: step, start: "top 90%", end: "bottom 55%" });
+            ScrollTrigger.create({
+              trigger: step,
+              start: "top bottom",
+              end: () => `bottom+=${(steps[i + 1]?.offsetHeight ?? 0) * 0.5} top`,
+              onUpdate: (self) => send({ progress: run.progress, active: self.isActive }),
+              onToggle: (self) => send({ progress: run.progress, active: self.isActive }),
+            });
+          }
           ScrollTrigger.create({
             trigger: step,
             start: "top 55%",
@@ -65,9 +80,7 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
         <div className="arch relative h-full w-full bg-linen">
           {chapters.map((c, i) => (
             <div key={c.title} data-layer className={clsx("absolute inset-0", i > 0 && "[clip-path:inset(100%_0%_0%_0%)]")}>
-              <div className="absolute inset-0">
-                <Photo image={c.image} sizes="45vw" />
-              </div>
+              <div className="absolute inset-0">{c.scan ? <ScanWindow /> : <Photo image={c.image} sizes="45vw" />}</div>
             </div>
           ))}
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-night/60 to-transparent p-8 pt-24 text-porcelain">
@@ -92,7 +105,11 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
               )}
             />
             <div className="arch relative mb-8 aspect-[4/5] w-full max-w-md pin:hidden phone:mb-2.5 phone:aspect-[3/2]">
-              <Photo image={c.image} sizes="(max-width: 767px) 62vw, (min-width: 640px) 28rem, 90vw" />
+              {c.scan ? (
+                <ScanStill alt="A 3D scan of a lower dental arch, the kind we take at your first exam" />
+              ) : (
+                <Photo image={c.image} sizes="(max-width: 767px) 62vw, (min-width: 640px) 28rem, 90vw" />
+              )}
             </div>
             <p className="eyebrow text-sage">
               Step {i + 1} · {c.kicker}
