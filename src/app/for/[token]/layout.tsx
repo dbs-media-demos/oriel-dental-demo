@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { BizProvider } from "@/components/preview/BizContext";
 import { PreviewGuard } from "@/components/preview/PreviewGuard";
+import { LogoLoader } from "@/components/preview/LogoLoader";
 import { Translate, translateGateCss } from "@/components/preview/Translate";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { previewBiz } from "@/lib/preview";
@@ -18,6 +19,8 @@ export default async function PreviewLayout({ children, params }: { children: Re
   if (!biz) notFound();
   return (
     <BizProvider biz={biz} dict={biz.lang === "sr" ? sr : null}>
+      {/* Their logo draws itself before the homepage shows (first view in the tab) */}
+      {biz.logo && <LogoLoader svg={biz.logo.svg} token={token} exit="fade" />}
       {biz.lang === "sr" && (
         <>
           <style>{translateGateCss}</style>

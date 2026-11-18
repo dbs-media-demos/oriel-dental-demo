@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { useBiz } from "@/components/preview/BizContext";
+import { inlineLogo } from "@/lib/logo";
 
 /** Shared geometry, reused by the favicon, OG image and manifest icon. */
 export const MARK = {
@@ -26,6 +27,17 @@ export function Mark({ className, sun = "var(--color-glow)" }: { className?: str
 
 export function Logo({ className, compact }: { className?: string; compact?: boolean }) {
   const biz = useBiz();
+  // Their own logo, in the header's ink (currentColor)
+  if (biz.logo) {
+    return (
+      <span
+        role="img"
+        aria-label={biz.name}
+        className={clsx("biz-logo h-9 max-w-[min(16rem,56vw)] sm:max-w-[20rem] phone:h-8", className)}
+        dangerouslySetInnerHTML={{ __html: inlineLogo(biz.logo.svg) }}
+      />
+    );
+  }
   // A preview sets the business's own name in the same type; long names step down a size
   const long = biz.preview && biz.shortName.length > 14;
   return (

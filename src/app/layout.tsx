@@ -72,7 +72,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${frauncesExt.variable} ${figtree.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${frauncesExt.variable} ${figtree.variable}`}>
       <body>
         <link rel="preload" href="/fonts/fraunces-phone.woff2" as="font" type="font/woff2" crossOrigin="anonymous" media={PHONE_MEDIA} />
         <link rel="preload" href="/fonts/fraunces-phone-italic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" media={PHONE_MEDIA} />

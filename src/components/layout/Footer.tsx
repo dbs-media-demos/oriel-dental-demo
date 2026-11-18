@@ -4,7 +4,8 @@ import { OpenBadge } from "@/components/ui/OpenBadge";
 import { footerNav, site } from "@/content/site";
 import { services } from "@/content/services";
 import { defaultBiz } from "@/lib/biz";
-import { DAY_NAMES, dayRange, telOf, weekFromMonday, type Biz } from "@/lib/biz-core";
+import { DAY_NAMES, L, areasOf, dayRange, telOf, weekFromMonday, type Biz } from "@/lib/biz-core";
+import { inlineLogo } from "@/lib/logo";
 
 export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
   return (
@@ -12,6 +13,9 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
       <div className="container-x pt-24 md:pt-32 phone:pt-8">
         <div className="grid gap-16 lg:grid-cols-[1.3fr_1fr] phone:gap-6">
           <div>
+            {biz.logo && (
+              <span role="img" aria-label={biz.name} className="biz-logo mb-8 h-12 max-w-[22rem] text-porcelain phone:mb-4 phone:h-9 phone:max-w-[16rem]" dangerouslySetInnerHTML={{ __html: inlineLogo(biz.logo.svg) }} />
+            )}
             <p className="eyebrow text-mist">{biz.preview ? `${biz.name} · ${biz.area}` : "Oriel Dental Studio · Uptown Dallas"}</p>
             <p className="display mt-6 max-w-[14ch] text-[clamp(2.6rem,6vw,5.6rem)] phone:mt-2 phone:text-[1.8rem]">
               Dentistry, in a <em className="text-glow">better light.</em>
@@ -43,6 +47,11 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
                   </>
                 )}
               </address>
+              {biz.preview && areasOf(biz).length > 1 && (
+                <p className="mt-3 leading-snug text-porcelain/70 phone:mt-1.5">
+                  {L(biz, "Serving", "Pacijenti nam dolaze iz mesta:")} {areasOf(biz).join(", ")}
+                </p>
+              )}
               {!biz.preview && (
                 <a href={`mailto:${site.email}`} className="link-underline mt-3 inline-block break-all text-porcelain/80 hover:text-porcelain phone:mt-1.5">
                   {site.email}
@@ -109,7 +118,11 @@ export function Footer({ biz = defaultBiz }: { biz?: Biz }) {
 
         <div className="mt-20 flex flex-col gap-6 border-t border-porcelain/15 pt-8 text-[0.85rem] text-porcelain/60 md:flex-row md:items-center md:justify-between phone:mt-5 phone:flex-col phone:items-start phone:gap-2 phone:pt-4 phone:text-[0.75rem]">
           <div className="flex items-center gap-3">
-            <Mark className="h-7 w-auto text-porcelain" />
+            {biz.logo ? (
+              <span aria-hidden className="biz-logo h-6 max-w-[9rem] shrink-0 text-porcelain" dangerouslySetInnerHTML={{ __html: inlineLogo(biz.logo.svg) }} />
+            ) : (
+              <Mark className="h-7 w-auto text-porcelain" />
+            )}
             <span>
               {biz.preview
                 ? `© ${new Date().getFullYear()} ${biz.name}. ${biz.lang === "sr" ? `Pregled početne strane napravljen za ${biz.name}.` : `A preview homepage made for ${biz.name}.`}`

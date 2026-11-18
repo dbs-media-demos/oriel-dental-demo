@@ -2,7 +2,7 @@ import { SectionIntro } from "@/components/ui/SectionIntro";
 import { Reveal } from "@/components/ui/Reveal";
 import { Button, Arrow } from "@/components/ui/Button";
 import { OpenBadge } from "@/components/ui/OpenBadge";
-import { DAY_NAMES, L, dayRange, weekFromMonday, type Biz } from "@/lib/biz-core";
+import { DAY_NAMES, L, areasOf, dayRange, weekFromMonday, type Biz } from "@/lib/biz-core";
 
 /** A preview's "visit us": the practice's real address on a Google map, its hours and directions. */
 export function PreviewMap({ biz }: { biz: Biz }) {
@@ -31,6 +31,18 @@ export function PreviewMap({ biz }: { biz: Biz }) {
                   </div>
                 ))}
               </dl>
+            )}
+            {areasOf(biz).length > 1 && (
+              <div>
+                <p className="eyebrow text-sage">{L(biz, "Patients come in from", "Pacijenti nam dolaze iz")}</p>
+                <ul className="mt-3 flex flex-wrap gap-2 phone:mt-2 phone:gap-1.5">
+                  {areasOf(biz).map((a) => (
+                    <li key={a} className="rounded-full border border-line bg-shell px-4 py-1.5 text-[0.92rem] text-ink phone:px-3 phone:py-1 phone:text-[0.82rem]">
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <Button href={directions} variant="ghost" icon={<Arrow />}>
               {L(biz, "Get directions", "Kako do nas")}

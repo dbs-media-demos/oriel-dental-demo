@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { whenLoaderDone } from "@/lib/loader";
 import clsx from "clsx";
 import { afterLoad, canLive3D, cpuFast, FX_OFF, holdFirst, idle } from "@/components/fx/guard";
 import type { LiveScene } from "@/components/fx/tooth/live";
@@ -79,7 +80,8 @@ export function HeroRoom({ className }: { className?: string }) {
           if (cancelled) return;
           setOn(true);
           // The still and the first frame match, so the fade is invisible; then the room comes alive
-          timers.push(window.setTimeout(() => scene.call("intro"), 700));
+          // (and once the lead's logo loader has gone, so it plays in view)
+          off.push(whenLoaderDone(() => timers.push(window.setTimeout(() => scene.call("intro"), 700))));
           scene.watch(running);
           // reloaded further down the page: the scenes below needn't wait for this one to be seen
           timers.push(window.setTimeout(release, 4000));
