@@ -21,7 +21,6 @@ export function Header() {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [openedAt, setOpenedAt] = useState(pathname);
-  const lastY = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -31,12 +30,31 @@ export function Header() {
   }
 
   useEffect(() => {
+    // Hysteresis: the header only flips once the page has moved 12 px one way since the last
+    // flip (or since the furthest point in the current direction). Lenis eases a scroll out in
+    // steps of a pixel or two, and comparing each step with the one before showed and hid the
+    // header over and over.
+    let anchor = window.scrollY;
+    let isHidden = false;
+    const set = (h: boolean) => {
+      isHidden = h;
+      setHidden(h);
+    };
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 24);
-      setHidden(y > 480 && y > lastY.current + 4);
-      if (y < lastY.current - 4 || y < 480) setHidden(false);
-      lastY.current = y;
+      const dy = y - anchor;
+      if (y < 480) {
+        set(false);
+        anchor = y;
+      } else if (isHidden ? dy > 0 : dy < 0) anchor = y; // still going the same way: follow it to the turning point
+      else if (dy > 12) {
+        set(true);
+        anchor = y;
+      } else if (dy < -12) {
+        set(false);
+        anchor = y;
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

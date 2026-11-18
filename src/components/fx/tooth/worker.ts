@@ -24,13 +24,19 @@ function gpuOk() {
 }
 let gpu: boolean | undefined;
 
-/** The first 2 s of frames on screen: about 45 fps on average, and no frame over 100 ms. */
+/**
+ * The first 2 s of frames on screen: about 45 fps on average, and no 3rd frame over 100 ms nor one
+ * over 400 ms. A hitch or two (a font, an image decode, another tab) isn't a slow computer.
+ */
 const WATCH_MS = 2000;
 const MIN_FPS = 45;
 const MAX_FRAME = 100;
-const WARM = 4; // first frames after (re)starting the loop are not judged
+const MAX_HITCHES = 3;
+// first frames after (re)starting the loop are not judged: they pay one-off costs (the GPU's first
+// real draw took 371 ms on a refresh on a PC that then ran 112 fps, 18 Nov)
+const WARM = 5;
 
-type Watch = { on: boolean; done: boolean; prev: number; skip: number; run: number; frames: number; worst: number };
+type Watch = { on: boolean; done: boolean; prev: number; skip: number; run: number; frames: number; worst: number; hitches: number };
 
 const scenes = new Map<string, { scene: ToothScene | ScanScene; watch: Watch }>();
 const dead = new Set<string>();
@@ -54,10 +60,12 @@ function onFrame(id: string, now: number, fresh: boolean) {
   w.run += d;
   w.frames++;
   w.worst = Math.max(w.worst, d);
-  if (w.worst > MAX_FRAME || w.run >= WATCH_MS) {
+  if (d > MAX_FRAME) w.hitches++;
+  const hitched = w.hitches >= MAX_HITCHES || w.worst > MAX_FRAME * 4;
+  if (hitched || w.run >= WATCH_MS) {
     w.done = true;
     const fps = (w.frames * 1000) / w.run;
-    post({ type: "verdict", id, ok: w.worst <= MAX_FRAME && fps >= MIN_FPS, fps: Math.round(fps), worst: Math.round(w.worst) });
+    post({ type: "verdict", id, ok: !hitched && fps >= MIN_FPS, fps: Math.round(fps), worst: Math.round(w.worst) });
   }
 }
 
@@ -68,7 +76,7 @@ async function handle(m: ToWorker) {
     try {
       gpu ??= gpuOk();
       if (!gpu) throw new Error("no hardware WebGL");
-      const watch: Watch = { on: false, done: false, prev: 0, skip: WARM, run: 0, frames: 0, worst: 0 };
+      const watch: Watch = { on: false, done: false, prev: 0, skip: WARM, run: 0, frames: 0, worst: 0, hitches: 0 };
       const opts = { size: m.size, onFrame: (now: number, fresh: boolean) => onFrame(m.id, now, fresh) };
       const scene = m.kind === "tooth" ? await createTooth(m.canvas, opts) : await createScan(m.canvas, opts);
       if (dead.has(m.id)) return scene.dispose();

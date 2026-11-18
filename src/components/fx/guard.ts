@@ -3,29 +3,39 @@
  *
  * Live 3D only on a big screen with a mouse, without reduced motion or Save-Data, in a browser that
  * can draw WebGL from a worker, on a machine whose processor keeps up. Anything else keeps the stills
- * that are in the server HTML. A scene that fails later (no proper graphics chip, or under ~45 fps in
- * its first 2 s) calls `goStill()`: every scene fades back to its still and stays that way for the
- * rest of the visit (sessionStorage).
+ * that are in the server HTML. A scene that fails later calls `goStill()`: every scene on the page
+ * fades back to its still. No proper graphics chip (`"gpu"`) keeps the stills for the rest of the
+ * visit at once; running slow (`"slow"`: the frame watch or the CPU check) is counted once per page
+ * load (sessionStorage) and keeps them only after 2 slow loads. On 18 Nov one slow start on a
+ * refresh (the GPU's first draw) kept a fast PC on the stills for the whole tab.
  */
 
 /** Same as the `pin` variant in globals.css. */
 const DESK_3D = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
 const KEY = "oriel:3d";
+const SLOW = "oriel:3d-slow";
+const SLOW_LIMIT = 2;
+// This page load ran slow: the scenes after it on this page stay stills too (counted once per load)
+let slowHere = false;
 /** Fired on window when the 3D is off for this visit; mounted scenes fade back to their stills. */
 export const FX_OFF = "oriel:3d-off";
 
 export function stillOnly() {
+  if (slowHere) return true;
   try {
-    return sessionStorage.getItem(KEY) === "still";
+    // only "gpu" counts under the old key: a tab's old "still" (one slow start) doesn't hold any more
+    return sessionStorage.getItem(KEY) === "gpu" || Number(sessionStorage.getItem(SLOW) || 0) >= SLOW_LIMIT;
   } catch {
     return false;
   }
 }
 
-export function goStill(reason: string) {
+export function goStill(why: "gpu" | "slow", reason: string) {
   try {
-    sessionStorage.setItem(KEY, "still");
+    if (why === "gpu") sessionStorage.setItem(KEY, "gpu");
+    else if (!slowHere) sessionStorage.setItem(SLOW, String(Number(sessionStorage.getItem(SLOW) || 0) + 1));
   } catch {}
+  if (why === "slow") slowHere = true;
   performance.mark("fx:still", { detail: reason });
   window.dispatchEvent(new CustomEvent(FX_OFF, { detail: reason }));
 }
@@ -67,7 +77,7 @@ export const cpuFast = () =>
       best = Math.min(best, performance.now() - t + (s > 1e12 ? 1 : 0));
     }
     performance.mark("fx:cpu", { detail: Math.round(best * 10) / 10 });
-    if (best > CPU_LIMIT_MS) goStill("cpu");
+    if (best > CPU_LIMIT_MS) goStill("slow", "cpu");
     return best <= CPU_LIMIT_MS;
   })());
 
