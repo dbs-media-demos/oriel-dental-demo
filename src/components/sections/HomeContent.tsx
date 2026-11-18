@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { HomeHero } from "@/components/sections/HomeHero";
+import { HeroArch } from "@/components/sections/HeroArch";
+import { ArchChart, LeafShadow } from "@/components/sections/ArchChart";
 import { Intro } from "@/components/sections/Intro";
 import { TreatmentIndex } from "@/components/sections/TreatmentIndex";
 import { Journey } from "@/components/sections/Journey";
@@ -63,11 +65,16 @@ const previewMarquee = marqueeWords.filter((w) => w !== "Se habla español" && w
  * art. 53 rules out as we read it: the smile gallery, result stories, promises and comparisons, and
  * what reads as a lure: the gift step, free consultations and free first visits.
  *
+ * `hero` is the one switch between the two homepages: "3d" (/ and /for/<token>) shows the porcelain
+ * tooth in three.js; "2d" (/v2 and /for/<token>/v2) charts the upper arch in SVG and CSS instead, and
+ * the exam step further down keeps its still scan with a drawn scan line. No three.js on "2d".
+ *
  * `order` only takes effect on phones (.home-flow is a column there): first the things a patient
  * looks for, in the order this niche needs them; desktop reads top to bottom as written.
  */
-export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; children?: ReactNode }) {
+export function HomeContent({ biz = defaultBiz, hero = "3d", children }: { biz?: Biz; hero?: "3d" | "2d"; children?: ReactNode }) {
   const sr = biz.lang === "sr";
+  const flat = hero === "2d";
   // English leads with the free offer where there is one; Serbian shows the ordinary price instead
   const firstPrice = (price: string) => {
     const parts = price.split(" · ");
@@ -88,7 +95,16 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
     <div className="home-flow">
       {children}
       <div data-tr-first className="order-1">
-        <HomeHero image={img.studioConsult} />
+        <HomeHero
+          image={img.studioConsult}
+          art={
+            flat ? (
+              <HeroArch leaves={<LeafShadow />} className="phone:hidden">
+                <ArchChart caption={[tr(biz, "Upper arch"), tr(biz, "charted at your first visit")]} />
+              </HeroArch>
+            ) : undefined
+          }
+        />
       </div>
 
       <div data-tr-first className="order-2 border-y border-line bg-shell py-6 phone:py-2.5">
@@ -160,7 +176,7 @@ export function HomeContent({ biz = defaultBiz, children }: { biz?: Biz; childre
             className="max-w-3xl"
           />
           <div className="mt-16 md:mt-24 phone:mt-4">
-            <Journey chapters={chapters.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
+            <Journey flat={flat} chapters={chapters.map((c) => ({ ...c, body: scrub(c.body, biz) }))} />
           </div>
         </div>
       </section>

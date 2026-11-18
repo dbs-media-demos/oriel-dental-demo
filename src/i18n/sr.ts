@@ -27,6 +27,8 @@ export const sr: Record<string, string> = {
   "Dentist in light scrubs chatting with a smiling patient in a bright treatment room": "Stomatološkinja razgovara sa nasmejanom pacijentkinjom u svetloj ordinaciji",
   "Soft light. Unhurried hands.": "Meko svetlo. Ruke bez žurbe.",
   "Honest prices.": "Cene unapred.",
+  "Upper arch": "Gornji zubni luk",
+  "charted at your first visit": "ucrtan na prvom pregledu",
   "Dentistry,": "Stomatologija",
   "in a": "u",
   "better light.": "dnevnom svetlu.",

@@ -15,14 +15,27 @@ export type ScanDetail = { progress: number; active: boolean };
  * finished scan; the live scene (in the 3D worker, desktop with a mouse only, see fx/guard.ts) warms up
  * while the browser is idle after the hero has settled, long before the journey is reached: built,
  * compiled and drawn once out of sight. Its first 2 s on screen are watched like the hero's.
+ *
+ * `live={false}` (/v2): never 3D. The still stays, and a scan line crosses it as you read the step,
+ * the part it hasn't reached yet held in shadow (two CSS properties per scroll update, no script
+ * beyond that).
  */
-export function ScanWindow({ className }: { className?: string }) {
+export function ScanWindow({ className, live: is3D = true }: { className?: string; live?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
+  const flatRef = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
 
   useEffect(() => {
+    const flat = flatRef.current;
+    if (is3D || !flat || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const onProgress = (e: Event) => flat.style.setProperty("--scan", (e as CustomEvent<ScanDetail>).detail.progress.toFixed(4));
+    window.addEventListener(SCAN_PROGRESS, onProgress);
+    return () => window.removeEventListener(SCAN_PROGRESS, onProgress);
+  }, [is3D]);
+
+  useEffect(() => {
     const el = host.current;
-    if (!el || !canLive3D()) return;
+    if (!is3D || !el || !canLive3D()) return;
 
     let cancelled = false;
     let live: LiveScene | undefined;
@@ -88,7 +101,7 @@ export function ScanWindow({ className }: { className?: string }) {
       live?.dispose();
       canvas.remove();
     };
-  }, []);
+  }, [is3D]);
 
   return (
     <div aria-hidden className={clsx("absolute inset-0 bg-[#1d2925]", className)}>
@@ -106,6 +119,12 @@ export function ScanWindow({ className }: { className?: string }) {
           className={clsx("absolute inset-0 h-full w-full object-cover transition-opacity duration-500", on && "opacity-0")}
         />
       </picture>
+      {!is3D && (
+        <div ref={flatRef} className="scan-flat absolute inset-0">
+          <span className="scan-flat-dim" />
+          <span className="scan-flat-line" />
+        </div>
+      )}
       {/* The live canvas goes in here (made in the effect: it's handed to the worker) */}
       <div ref={host} data-fx="scan" data-on={on || undefined} className={clsx("absolute inset-0", on ? "opacity-100" : "opacity-0 transition-opacity delay-500 duration-300")} />
     </div>

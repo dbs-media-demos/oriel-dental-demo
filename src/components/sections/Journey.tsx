@@ -14,9 +14,10 @@ export type Chapter = { kicker: string; title: string; body: string; points: str
  * The new-patient journey. On desktop the arch window stays pinned while chapters
  * scroll past; each chapter wipes its photo up into the window, and the exam step's
  * window is the 3D scan, built as you read it. On phones every chapter carries its
- * own photo (the exam: a still of the finished scan), in a row to swipe.
+ * own photo (the exam: a still of the finished scan), in a row to swipe. `flat` (/v2): the exam
+ * step keeps the still of the scan, with a scan line drawn over it as you read, and no three.js.
  */
-export function Journey({ chapters }: { chapters: Chapter[] }) {
+export function Journey({ chapters, flat = false }: { chapters: Chapter[]; flat?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -80,7 +81,7 @@ export function Journey({ chapters }: { chapters: Chapter[] }) {
         <div className="arch relative h-full w-full bg-linen">
           {chapters.map((c, i) => (
             <div key={c.title} data-layer className={clsx("absolute inset-0", i > 0 && "[clip-path:inset(100%_0%_0%_0%)]")}>
-              <div className="absolute inset-0">{c.scan ? <ScanWindow /> : <Photo image={c.image} sizes="45vw" />}</div>
+              <div className="absolute inset-0">{c.scan ? <ScanWindow live={!flat} /> : <Photo image={c.image} sizes="45vw" />}</div>
             </div>
           ))}
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-night/60 to-transparent p-8 pt-24 text-porcelain">

@@ -31,8 +31,10 @@ const PHONE_PHOTO_SIZES ="(max-width: 767.98px) 100vw, (hover: none) and (max-wi
  * mouse). Shutters open it on the first frame; on scroll GSAP widens the arch until the room fills the
  * screen and the sun sinks. On phones it's a stacked first screen: the studio photo with a small still
  * of the tooth, the service and town, the rating, plans and a Call button with the number, painted whole.
+ *
+ * `art` replaces the 3D room in the window (/v2: HeroArch, no three.js); everything else is the same.
  */
-export function HomeHero({ image }: { image: Img }) {
+export function HomeHero({ image, art }: { image: Img; art?: React.ReactNode }) {
   const biz = useBiz();
   const t = useT();
   const sr = biz.lang === "sr";
@@ -70,8 +72,8 @@ export function HomeHero({ image }: { image: Img }) {
       <div className="hero-stage sticky top-0 h-svh overflow-hidden">
         {/* The window */}
         <div data-frame className="hero-frame absolute inset-0 will-change-[clip-path]">
-          {/* Desktop: the sunlit room with the porcelain tooth */}
-          <HeroRoom className="phone:hidden" />
+          {/* Desktop: the sunlit room with the porcelain tooth (or /v2's charted arch) */}
+          {art ?? <HeroRoom className="phone:hidden" />}
           {/* Phones: the studio, and the same tooth in a small arch */}
           <div className="absolute inset-0 hidden phone:block">
             <Photo image={image} sizes={PHONE_PHOTO_SIZES} preload quality={75} position="36% 40%" />
